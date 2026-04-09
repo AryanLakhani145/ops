@@ -1570,25 +1570,28 @@ const DEFAULT_TPLS=[
 // LOAD / SAVE  (localStorage + Supabase)
 // ══════════════════════════════════════
 function load(){
+  // Only reads from localStorage — never writes to Supabase
+  // Supabase hydration happens separately in boot() AFTER this
   tasks     = JSON.parse(localStorage.getItem(K.tasks)  || 'null') || JSON.parse(JSON.stringify(DEFAULT_TASKS));
   depts     = JSON.parse(localStorage.getItem(K.depts)  || 'null') || JSON.parse(JSON.stringify(DEFAULT_DEPTS));
   people    = JSON.parse(localStorage.getItem(K.people) || 'null') || JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
   templates = JSON.parse(localStorage.getItem(K.tpls)   || 'null') || JSON.parse(JSON.stringify(DEFAULT_TPLS));
 }
+
 function persist(){
+  // Just saves to localStorage — tasks sync individually via sbSaveTask/sbDeleteTask
   localStorage.setItem(K.tasks, JSON.stringify(tasks));
   localStorage.setItem(K.depts, JSON.stringify(depts));
   localStorage.setItem(K.people,JSON.stringify(people));
   localStorage.setItem(K.tpls,  JSON.stringify(templates));
-  // Only sync settings to Supabase — tasks sync individually via sbSaveTask/sbDeleteTask
-  sbSaveSettings().catch(()=>{});
 }
 
 function persistSettings(){
+  // Saves settings to localStorage AND Supabase
   localStorage.setItem(K.depts, JSON.stringify(depts));
   localStorage.setItem(K.people,JSON.stringify(people));
   localStorage.setItem(K.tpls,  JSON.stringify(templates));
-  sbSaveSettings().catch(e=>{ console.warn('Settings sync failed',e); });
+  sbSaveSettings().catch(e=>{ console.warn('Settings sync failed',e); syncStatus('err'); });
 }
 
 // ══════════════════════════════════════
@@ -2712,7 +2715,7 @@ async function sbDeleteNote(id){
 async function sbSaveSettings(){
   try{
     syncStatus('syncing');
-    await sbUpsert('nk_settings','tasks_meta',{tasks,depts,people,templates});
+    await sbUpsert('nk_settings','tasks_meta',{depts,people,templates});
     syncStatus('ok');
   }catch(e){ console.warn('Supabase settings save failed',e); syncStatus('err'); }
 }
