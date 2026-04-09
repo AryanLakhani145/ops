@@ -1580,9 +1580,15 @@ function persist(){
   localStorage.setItem(K.depts, JSON.stringify(depts));
   localStorage.setItem(K.people,JSON.stringify(people));
   localStorage.setItem(K.tpls,  JSON.stringify(templates));
-  // Fire-and-forget Supabase sync for settings + all tasks
+  // Only sync settings to Supabase — tasks sync individually via sbSaveTask/sbDeleteTask
   sbSaveSettings().catch(()=>{});
-  tasks.forEach(t => sbSaveTask(t).catch(()=>{}));
+}
+
+function persistSettings(){
+  localStorage.setItem(K.depts, JSON.stringify(depts));
+  localStorage.setItem(K.people,JSON.stringify(people));
+  localStorage.setItem(K.tpls,  JSON.stringify(templates));
+  sbSaveSettings().catch(e=>{ console.warn('Settings sync failed',e); });
 }
 
 // ══════════════════════════════════════
@@ -1989,7 +1995,7 @@ function taskHTML(t){
 function addTask(){
   const text=document.getElementById('taskInput').value.trim();
   if(!text){toast('Enter a task first');return;}
-  tasks.unshift({
+  const newTask = {
     id:uid(),text,
     dept:document.getElementById('dinput')?.value||depts[0]?.id,
     assignee:document.getElementById('ainput')?.value||'',
@@ -1997,7 +2003,10 @@ function addTask(){
     time:document.getElementById('tinput')?.value||'',
     dueDate:document.getElementById('dueinput')?.value||'',
     note:'',done:false,ts:Date.now()
-  });
+  };
+  tasks.unshift(newTask);
+  localStorage.setItem(K.tasks, JSON.stringify(tasks));
+  sbSaveTask(newTask).catch(e=>console.warn('Task save failed',e));
   document.getElementById('taskInput').value='';
   if(document.getElementById('dueinput')) document.getElementById('dueinput').value='';
   document.getElementById('taskInput').focus();
@@ -2023,6 +2032,8 @@ function toggleDone(id){
   const t=tasks.find(x=>x.id===id);
   if(!t) return;
   t.done=!t.done;
+  localStorage.setItem(K.tasks, JSON.stringify(tasks));
+  sbSaveTask(t).catch(e=>console.warn('Task sync failed',e));
   render(); toast(t.done?'Done ✓':'Back to pending');
 }
 
@@ -2068,6 +2079,8 @@ function saveTaskEdit(id){
   t.time     = document.getElementById('tep-time-'+id)?.value||'';
   t.dueDate  = document.getElementById('tep-due-'+id)?.value||'';
   t.note     = document.getElementById('tep-note-'+id)?.value.trim()||'';
+  localStorage.setItem(K.tasks, JSON.stringify(tasks));
+  sbSaveTask(t).catch(e=>console.warn('Task sync failed',e));
   render(); toast('Task updated ✓');
 }
 
@@ -2078,15 +2091,22 @@ function editNote(id){ openTaskEdit(id); }
 function carryForward(){
   const n=tasks.filter(t=>!t.done).length;
   if(!n){toast('No pending tasks');return;}
+  const toDelete=tasks.filter(t=>t.done).map(t=>t.id);
   tasks=tasks.filter(t=>!t.done);
   tasks.forEach(t=>t.ts=Date.now());
+  localStorage.setItem(K.tasks, JSON.stringify(tasks));
+  toDelete.forEach(id=>sbDeleteTask(id).catch(()=>{}));
+  tasks.forEach(t=>sbSaveTask(t).catch(()=>{}));
   render(); toast(`${n} tasks carried forward ✓`);
 }
 
 function clearDone(){
-  const n=tasks.filter(t=>t.done).length;
+  const done=tasks.filter(t=>t.done);
+  const n=done.length;
   if(!n){toast('No completed tasks to clear');return;}
   tasks=tasks.filter(t=>!t.done);
+  localStorage.setItem(K.tasks, JSON.stringify(tasks));
+  done.forEach(t=>sbDeleteTask(t.id).catch(()=>{}));
   render(); toast(`${n} task${n!==1?'s':''} cleared`);
 }
 
@@ -2183,6 +2203,7 @@ function saveDeptEdit(){
   }
   closeDeptPanel();
   rebuildAll(); render();
+  persistSettings();
   toast('Department saved ✓');
 }
 
@@ -2195,6 +2216,7 @@ function deleteSelectedDept(){
     depts=depts.filter(x=>x.id!==id);
     closeDeptPanel();
     rebuildAll(); render();
+    persistSettings();
     toast('Department deleted');
   });
 }
@@ -2258,6 +2280,7 @@ function savePersonEdit(){
   }
   closePersonPanel();
   rebuildAll(); render();
+  persistSettings();
   toast('Person saved ✓');
 }
 
@@ -2270,6 +2293,7 @@ function deleteSelectedPerson(){
     people=people.filter(x=>x.id!==id);
     closePersonPanel();
     rebuildAll(); render();
+    persistSettings();
     toast(`${p.name} removed`);
   });
 }
