@@ -1381,36 +1381,66 @@ const DEFAULT_TPLS=[
 // LOAD / SAVE
 // ══════════════════════════════════════
 async function load(){
-  const { data, error } = await supabase
-    .from('app_state')
-    .select('data')
-    .eq('id', 'main')
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('app_state')
+      .select('data')
+      .eq('id', 'main')
+      .single();
 
-  const saved = data?.data || {};
+    if (error) {
+      console.error('Supabase load error:', error);
 
-  tasks = saved.tasks || JSON.parse(JSON.stringify(DEFAULT_TASKS));
-  depts = saved.depts || JSON.parse(JSON.stringify(DEFAULT_DEPTS));
-  people = saved.people || JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
-  templates = saved.templates || JSON.parse(JSON.stringify(DEFAULT_TPLS));
-  notes = saved.notes || [];
-  crmClients = saved.crmClients || [];
+      // fallback so app still works
+      tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+      depts = JSON.parse(JSON.stringify(DEFAULT_DEPTS));
+      people = JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
+      templates = JSON.parse(JSON.stringify(DEFAULT_TPLS));
+      notes = [];
+      crmClients = [];
+      return;
+    }
+
+    const saved = data?.data || {};
+
+    tasks = saved.tasks || JSON.parse(JSON.stringify(DEFAULT_TASKS));
+    depts = saved.depts || JSON.parse(JSON.stringify(DEFAULT_DEPTS));
+    people = saved.people || JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
+    templates = saved.templates || JSON.parse(JSON.stringify(DEFAULT_TPLS));
+    notes = saved.notes || [];
+    crmClients = saved.crmClients || [];
+  } catch(err){
+    console.error(err);
+
+    tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+    depts = JSON.parse(JSON.stringify(DEFAULT_DEPTS));
+    people = JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
+    templates = JSON.parse(JSON.stringify(DEFAULT_TPLS));
+    notes = [];
+    crmClients = [];
+  }
 }
 
 async function persist(){
-  await supabase
-    .from('app_state')
-    .upsert({
-      id: 'main',
-      data: {
-        tasks,
-        depts,
-        people,
-        templates,
-        notes,
-        crmClients
-      }
-    });
+  try {
+    const { error } = await supabase
+      .from('app_state')
+      .upsert({
+        id: 'main',
+        data: {
+          tasks,
+          depts,
+          people,
+          templates,
+          notes,
+          crmClients
+        }
+      });
+
+    if (error) console.error('Supabase save error:', error);
+  } catch(err){
+    console.error(err);
+  }
 }
 
 // ══════════════════════════════════════
