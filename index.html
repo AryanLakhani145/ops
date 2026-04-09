@@ -6,6 +6,62 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Daily Ops · Nakshatra</title>
+<script>
+// ══════════════════════════════════════
+// SUPABASE CONFIG
+// ══════════════════════════════════════
+const SB_URL = 'https://lwaqwxsvgdghekzmanvy.supabase.co';
+const SB_KEY = 'sb_publishable_d4HMHHfzlfcTF0-_ZAIi9w_ffXgnxoV';
+
+async function sbFetch(path, opts={}){
+  const r = await fetch(SB_URL+'/rest/v1/'+path, {
+    headers:{
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer '+SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer||'',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if(!r.ok){ const t=await r.text(); throw new Error(t); }
+  return r.status===204?null:r.json();
+}
+
+// Upsert a single row: table has (id text PK, data jsonb)
+async function sbUpsert(table, id, data){
+  return sbFetch(table+'?on_conflict=id', {
+    method:'POST',
+    prefer:'resolution=merge-duplicates',
+    headers:{'Prefer':'resolution=merge-duplicates'},
+    body: JSON.stringify({id, data, updated_at: new Date().toISOString()})
+  });
+}
+
+// Get all rows from a table
+async function sbGetAll(table){
+  return sbFetch(table+'?select=id,data&order=updated_at.asc');
+}
+
+// Get single row by id
+async function sbGet(table, id){
+  const rows = await sbFetch(table+'?id=eq.'+encodeURIComponent(id)+'&select=id,data&limit=1');
+  return rows && rows.length ? rows[0].data : null;
+}
+
+// Delete a row
+async function sbDelete(table, id){
+  return sbFetch(table+'?id=eq.'+encodeURIComponent(id), { method:'DELETE' });
+}
+
+// Sync status UI
+function syncStatus(state){ // 'syncing'|'ok'|'err'
+  const el = document.getElementById('syncDot');
+  if(!el) return;
+  el.title = state==='ok'?'Synced':state==='syncing'?'Syncing…':'Sync error';
+  el.style.background = state==='ok'?'var(--c-green)':state==='syncing'?'var(--gold2)':'var(--c-red)';
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
@@ -775,6 +831,52 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
   .cc:hover .cc-quick{opacity:1;}
 }
 
+/* ── SAMPLES SUBSECTION ── */
+.crm-samples-section{margin:0 16px 32px;border:1.5px solid var(--rule);border-radius:var(--rlg);overflow:hidden;background:var(--white);box-shadow:var(--sh);}
+.css-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;transition:background .15s;user-select:none;}
+.css-header:hover{background:var(--cream2);}
+.css-title{display:flex;align-items:center;gap:9px;font-family:'Lora',serif;font-size:0.97rem;font-weight:600;color:var(--ink);}
+.css-count{display:inline-flex;align-items:center;justify-content:center;background:var(--cream3);border:1px solid var(--rule2);border-radius:10px;padding:1px 9px;font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:600;color:var(--ink3);}
+.css-sub{font-size:0.7rem;color:var(--c-amber);font-weight:500;}
+.css-arrow{font-size:0.85rem;color:var(--ink4);transition:transform .25s;}
+.css-arrow.open{transform:rotate(90deg);}
+.css-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.css-body.open{max-height:3000px;}
+.css-list{display:flex;flex-direction:column;gap:0;border-top:1.5px solid var(--rule);}
+.css-add-btn{width:100%;padding:12px;border:none;border-top:1.5px solid var(--rule);background:none;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;color:var(--ink3);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.css-add-btn:hover{background:var(--gold-lt);color:var(--gold);}
+
+/* Sample row */
+.css-row{display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid var(--rule);transition:background .15s;}
+.css-row:last-child{border-bottom:none;}
+.css-row:hover{background:var(--cream2);}
+.css-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--rule2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;margin-top:2px;}
+.css-check.checked{background:var(--c-green);border-color:var(--c-green);color:#fff;}
+.css-check:hover:not(.checked){border-color:var(--gold-bd);background:var(--gold-lt);}
+.css-row-body{flex:1;min-width:0;}
+.css-row-desc{font-size:0.88rem;color:var(--ink);font-weight:500;line-height:1.3;}
+.css-row-desc.sent-through{color:var(--ink4);text-decoration:line-through;}
+.css-row-meta{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;align-items:center;}
+.css-client-tag{font-size:0.67rem;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--bg-purple);color:var(--c-purple);border:1px solid var(--bd-purple);white-space:nowrap;}
+.css-status-tag{font-size:0.67rem;font-weight:600;padding:2px 7px;border-radius:4px;border:1px solid;white-space:nowrap;}
+.css-st-pending{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);}
+.css-st-sent{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
+.css-row-date{font-size:0.65rem;color:var(--ink4);}
+.css-row-qty{font-size:0.67rem;color:var(--ink3);padding:2px 7px;border-radius:4px;background:var(--cream2);border:1px solid var(--rule2);}
+.css-row-sal{font-size:0.67rem;color:var(--c-blue);padding:2px 7px;border-radius:4px;background:var(--bg-blue);border:1px solid var(--bd-blue);}
+.css-row-actions{display:flex;gap:4px;flex-shrink:0;margin-top:2px;}
+.css-ra{border:1.5px solid var(--rule2);border-radius:6px;background:transparent;color:var(--ink4);font-family:'DM Sans',sans-serif;font-size:0.6rem;font-weight:500;padding:4px 8px;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:0.04em;}
+.css-ra.mark-sent:hover{border-color:var(--bd-green);color:var(--c-green);background:var(--bg-green);}
+.css-ra.del-sample:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
+.css-remarks{font-size:0.75rem;color:var(--ink3);margin-top:4px;line-height:1.4;font-style:italic;}
+
+[data-theme="dark"] .crm-samples-section{background:var(--white);border-color:var(--rule2);}
+[data-theme="dark"] .css-count{background:var(--cream3);border-color:var(--rule2);}
+
+@media(min-width:900px){
+  .crm-samples-section{margin:0 28px 32px;}
+}
+
 /* ══════════════════════════════
    DESKTOP
 ══════════════════════════════ */
@@ -820,6 +922,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
     </div>
     <div class="hdr-right" id="hdrRight">
       <div style="display:flex;align-items:center;gap:8px;">
+        <div id="syncDot" title="Sync status" style="width:8px;height:8px;border-radius:50%;background:var(--ink4);flex-shrink:0;transition:background .3s;"></div>
         <button class="dm-toggle" id="dmToggle" onclick="toggleDarkMode()" title="Toggle dark mode"></button>
         <div>
           <div class="pct-num"><span id="pctEl">0</span>%</div>
@@ -975,6 +1078,78 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 
   <!-- Client list -->
   <div class="crm-list" id="crmList"></div>
+
+  <!-- ── SAMPLES SUBSECTION ── -->
+  <div class="crm-samples-section" id="crmSamplesSection">
+    <div class="css-header" onclick="crmToggleSamples()">
+      <div class="css-title">
+        <span>📦</span>
+        <span>Sample Requests</span>
+        <span class="css-count" id="cssTotalCount">0</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="css-sub" id="cssPendingCount"></span>
+        <span class="css-arrow" id="cssArrow">▸</span>
+      </div>
+    </div>
+    <div class="css-body" id="cssSamplesBody">
+      <div class="css-list" id="cssSamplesList"></div>
+      <button class="css-add-btn" onclick="openSampleModal()">+ Log Sample Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sample Request Modal -->
+<div class="crm-modal-overlay" id="sampleModalOverlay" onclick="closeSampleModal(event)">
+  <div class="crm-modal" id="sampleModal">
+    <div class="crm-modal-hd">
+      <div class="crm-modal-title" id="sampleModalTitle">Log Sample Request</div>
+      <button class="crm-modal-close" onclick="closeSampleModal()">✕</button>
+    </div>
+    <div class="crm-modal-grid">
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Party / Client *</div>
+        <select class="crm-modal-select" id="sm_clientId">
+          <option value="">— Select client —</option>
+        </select>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Date Requested</div>
+        <input class="crm-modal-input" id="sm_dateRequested" type="date"/>
+      </div>
+      <div class="crm-modal-field full">
+        <div class="crm-modal-lbl">Sample Description * <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink4)">(fabric, count, design, etc.)</span></div>
+        <input class="crm-modal-input" id="sm_description" type="text" placeholder="e.g. Viscose 60s dobby, 44 inch, ivory shade"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Quantity / Metres</div>
+        <input class="crm-modal-input" id="sm_qty" type="text" placeholder="e.g. 5 mtrs"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Sent By (Salesman)</div>
+        <input class="crm-modal-input" id="sm_salesman" type="text" placeholder="e.g. Avinash"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Status</div>
+        <select class="crm-modal-select" id="sm_status">
+          <option value="pending">⏳ Pending — Not Sent Yet</option>
+          <option value="sent">✅ Sent</option>
+        </select>
+      </div>
+      <div class="crm-modal-field" id="sm_dateSentField">
+        <div class="crm-modal-lbl">Date Sent</div>
+        <input class="crm-modal-input" id="sm_dateSent" type="date"/>
+      </div>
+      <div class="crm-modal-field full">
+        <div class="crm-modal-lbl">Remarks</div>
+        <textarea class="crm-modal-ta" id="sm_remarks" rows="2" placeholder="Any notes — client feedback, follow-up needed, etc."></textarea>
+      </div>
+    </div>
+    <div class="crm-modal-actions">
+      <button class="crm-modal-save" onclick="saveSampleModal()">Save</button>
+      <button class="crm-modal-cancel" onclick="closeSampleModal()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <!-- CRM Add/Edit Modal -->
@@ -1033,13 +1208,6 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
           <option value="high">⬆ High</option>
           <option value="med">➡ Medium</option>
           <option value="low">⬇ Low</option>
-        </select>
-      </div>
-      <div class="crm-modal-field">
-        <div class="crm-modal-lbl">Sample Sent?</div>
-        <select class="crm-modal-select" id="cm_sample">
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
         </select>
       </div>
       <div class="crm-modal-field">
@@ -1300,13 +1468,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-const _supabase = supabase.createClient(
-  'https://lwaqwxsvgdghekzmanvy.supabase.co',
-  'sb_publishable_d4HMHHfzlfcTF0-_ZAIi9w_ffXgnxoV'
-);
 // ══════════════════════════════════════
 // CONSTANTS & PALETTE
 // ══════════════════════════════════════
@@ -1377,7 +1539,7 @@ const DEFAULT_TPLS=[
 ];
 
 // ══════════════════════════════════════
-// LOAD / SAVE
+// LOAD / SAVE  (localStorage + Supabase)
 // ══════════════════════════════════════
 function load(){
   tasks     = JSON.parse(localStorage.getItem(K.tasks)  || 'null') || JSON.parse(JSON.stringify(DEFAULT_TASKS));
@@ -1390,19 +1552,62 @@ function persist(){
   localStorage.setItem(K.depts, JSON.stringify(depts));
   localStorage.setItem(K.people,JSON.stringify(people));
   localStorage.setItem(K.tpls,  JSON.stringify(templates));
+  // Fire-and-forget Supabase sync for settings + all tasks
+  sbSaveSettings().catch(()=>{});
+  tasks.forEach(t => sbSaveTask(t).catch(()=>{}));
 }
 
 // ══════════════════════════════════════
-// BOOT
+// BOOT — load from Supabase if available
 // ══════════════════════════════════════
-function boot(){
+async function boot(){
+  // First render from localStorage immediately (instant)
   load();
   document.getElementById('dateEl').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
   rebuildAll();
   render();
   initNotes();
-  loadCRM();
   initDarkMode();
+
+  // Then hydrate from Supabase in background
+  try {
+    syncStatus('syncing');
+
+    // Load settings (depts, people, templates, tasks_meta)
+    const settingsMeta = await sbGet('nk_settings','tasks_meta');
+    if(settingsMeta){
+      if(settingsMeta.depts)     { depts=settingsMeta.depts; localStorage.setItem(K.depts,JSON.stringify(depts)); }
+      if(settingsMeta.people)    { people=settingsMeta.people; localStorage.setItem(K.people,JSON.stringify(people)); }
+      if(settingsMeta.templates) { templates=settingsMeta.templates; localStorage.setItem(K.tpls,JSON.stringify(templates)); }
+    }
+
+    // Load tasks
+    const taskRows = await sbGetAll('nk_tasks');
+    if(taskRows && taskRows.length){
+      tasks = taskRows.map(r=>r.data).filter(Boolean);
+      localStorage.setItem(K.tasks, JSON.stringify(tasks));
+    }
+
+    // Load notes
+    const noteRows = await sbGetAll('nk_notes');
+    if(noteRows && noteRows.length){
+      notes = noteRows.map(r=>r.data).filter(Boolean);
+      localStorage.setItem(NK, JSON.stringify(notes));
+    }
+
+    // Rebuild UI with fresh data
+    rebuildAll();
+    render();
+    renderNotes();
+    syncStatus('ok');
+  } catch(e){
+    console.warn('Supabase boot hydration failed, using local data', e);
+    syncStatus('err');
+  }
+
+  // Load CRM (has its own Supabase calls)
+  await loadCRM();
+  crmRender();
 }
 
 function rebuildAll(){
@@ -1751,6 +1956,7 @@ function delTask(id){
   if(!t) return;
   customConfirm(`Delete "<strong>${esc(t.text.slice(0,50))}</strong>"?`, ()=>{
     tasks=tasks.filter(x=>x.id!==id);
+    sbDeleteTask(id).catch(()=>{});
     render(); toast('Task removed');
   });
 }
@@ -2103,7 +2309,11 @@ function catMeta(id){ return NOTE_CATS.find(c=>c.id===id) || NOTE_CATS[0]; }
 function loadNotes(){
   notes = JSON.parse(localStorage.getItem(NK)||'null') || [];
 }
-function saveNotes(){ localStorage.setItem(NK, JSON.stringify(notes)); }
+function saveNotes(){
+  localStorage.setItem(NK, JSON.stringify(notes));
+  // Sync all notes to Supabase (fire and forget)
+  notes.forEach(n => sbSaveNote(n).catch(()=>{}));
+}
 
 function initNotes(){
   loadNotes();
@@ -2275,6 +2485,7 @@ function deleteNote(id){
   customConfirm(`Delete this note?`, ()=>{
     notes = notes.filter(x=>x.id!==id);
     saveNotes();
+    sbDeleteNote(id).catch(()=>{});
     renderNotes();
     toast('Note deleted');
   });
@@ -2333,20 +2544,126 @@ function applyTheme(){
 // ══════════════════════════════════════
 const CRM_KEY = 'nk_crm_v1';
 let crmClients = [];
-
-async function loadCloudData() {
-  const { data: clients } = await _supabase.from('clients').select('*');
-  if (clients) {
-    crmClients = clients;
-    renderCrmTable();
-  }
-}
-loadCloudData();
 let crmFilter  = 'all';
 let crmEditId  = null;
 
-function loadCRM(){ try{ crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]'); }catch(e){ crmClients=[]; } }
-function saveCRM(){ localStorage.setItem(CRM_KEY, JSON.stringify(crmClients)); }
+// ── SAMPLES ──
+let crmSamples = [];
+let sampleEditId = null;
+let samplesOpen = false;
+
+// ── SUPABASE SYNC LAYER ──
+// Each entity syncs individually by id to Supabase.
+// Falls back to localStorage if offline.
+
+async function sbSaveClient(c){
+  try{
+    syncStatus('syncing');
+    await sbUpsert('nk_clients', c.id, c);
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase client save failed',e); syncStatus('err'); }
+  // Also mirror to localStorage as fallback
+  localStorage.setItem(CRM_KEY, JSON.stringify(crmClients));
+}
+
+async function sbDeleteClient(id){
+  try{
+    syncStatus('syncing');
+    await sbDelete('nk_clients', id);
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase client delete failed',e); syncStatus('err'); }
+  localStorage.setItem(CRM_KEY, JSON.stringify(crmClients));
+}
+
+async function sbSaveSample(s){
+  try{
+    syncStatus('syncing');
+    await sbUpsert('nk_settings', 'sample_'+s.id, s);
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase sample save failed',e); syncStatus('err'); }
+  localStorage.setItem('nk_samples_v1', JSON.stringify(crmSamples));
+}
+
+async function sbDeleteSample(id){
+  try{
+    syncStatus('syncing');
+    await sbDelete('nk_settings', 'sample_'+id);
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase sample delete failed',e); syncStatus('err'); }
+  localStorage.setItem('nk_samples_v1', JSON.stringify(crmSamples));
+}
+
+async function sbSaveNote(n){
+  try{
+    syncStatus('syncing');
+    await sbUpsert('nk_notes', n.id, n);
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase note save failed',e); syncStatus('err'); }
+}
+
+async function sbDeleteNote(id){
+  try{
+    syncStatus('syncing');
+    await sbDelete('nk_notes', id);
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase note delete failed',e); syncStatus('err'); }
+}
+
+async function sbSaveSettings(){
+  try{
+    syncStatus('syncing');
+    await sbUpsert('nk_settings','tasks_meta',{tasks,depts,people,templates});
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase settings save failed',e); syncStatus('err'); }
+}
+
+async function sbSaveTask(t){
+  try{
+    syncStatus('syncing');
+    await sbUpsert('nk_tasks', t.id, t);
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase task save failed',e); syncStatus('err'); }
+}
+
+async function sbDeleteTask(id){
+  try{
+    syncStatus('syncing');
+    await sbDelete('nk_tasks', id);
+    syncStatus('ok');
+  }catch(e){ console.warn('Supabase task delete failed',e); syncStatus('err'); }
+}
+
+// ── LOAD FROM SUPABASE ON BOOT ──
+async function loadCRM(){
+  syncStatus('syncing');
+  try{
+    // Load clients
+    const clientRows = await sbGetAll('nk_clients');
+    if(clientRows && clientRows.length){
+      crmClients = clientRows.map(r=>r.data).filter(Boolean);
+      localStorage.setItem(CRM_KEY, JSON.stringify(crmClients));
+    } else {
+      crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]');
+    }
+
+    // Load samples (stored as nk_settings rows with key 'sample_xxx')
+    const settingRows = await sbGetAll('nk_settings');
+    if(settingRows){
+      const sampleRows = settingRows.filter(r=>r.id.startsWith('sample_'));
+      crmSamples = sampleRows.map(r=>r.data).filter(Boolean);
+      localStorage.setItem('nk_samples_v1', JSON.stringify(crmSamples));
+    } else {
+      crmSamples = JSON.parse(localStorage.getItem('nk_samples_v1')||'[]');
+    }
+
+    syncStatus('ok');
+  } catch(e){
+    console.warn('Supabase load failed, falling back to localStorage', e);
+    crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]');
+    crmSamples = JSON.parse(localStorage.getItem('nk_samples_v1')||'[]');
+    syncStatus('err');
+  }
+}
 
 function crmUid(){ return 'c'+Date.now()+'_'+Math.random().toString(36).slice(2,6); }
 
@@ -2427,13 +2744,12 @@ function lastContact(c){
 
 // ── STATS ──
 function crmUpdateStats(){
-  const today = todayStr();
   document.getElementById('cst-total').textContent   = crmClients.length;
   document.getElementById('cst-hot').textContent     = crmClients.filter(c=>c.status==='hot').length;
   document.getElementById('cst-warm').textContent    = crmClients.filter(c=>c.status==='warm').length;
   document.getElementById('cst-cold').textContent    = crmClients.filter(c=>c.status==='cold').length;
   document.getElementById('cst-overdue').textContent = crmClients.filter(c=>isOverdue(c)).length;
-  document.getElementById('cst-sampled').textContent = crmClients.filter(c=>c.sample==='yes').length;
+  document.getElementById('cst-sampled').textContent = crmSamples.filter(s=>s.status==='sent').length;
   document.getElementById('cst-ordered').textContent = crmClients.filter(c=>c.ordered==='yes').length;
 }
 
@@ -2441,7 +2757,6 @@ function crmUpdateStats(){
 function crmRender(){
   crmUpdateStats();
   const filtered = crmApplyFilter(crmClients);
-  // Sort: overdue first, then by nextdate, then by name
   filtered.sort((a,b)=>{
     if(isOverdue(a)!==isOverdue(b)) return isOverdue(a)?-1:1;
     if(a.nextdate && b.nextdate) return a.nextdate.localeCompare(b.nextdate);
@@ -2453,10 +2768,10 @@ function crmRender(){
   const el = document.getElementById('crmList');
   if(!filtered.length){
     el.innerHTML=`<div class="crm-empty"><div class="crm-empty-icon">— Nothing here —</div><p>${crmFilter==='all'?'Add your first client or party above.':'No clients match this filter.'}</p></div>`;
-    return;
+  } else {
+    el.innerHTML = filtered.map(c=>crmCardHTML(c)).join('');
   }
-
-  el.innerHTML = filtered.map(c=>crmCardHTML(c)).join('');
+  renderSamples();
 }
 
 function crmCardHTML(c){
@@ -2467,6 +2782,10 @@ function crmCardHTML(c){
   const nb = nextBadge(c);
   const initials = (c.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
   const history = c.history||[];
+  // Sample count for this client
+  const clientSamples = crmSamples.filter(s=>s.clientId===c.id);
+  const pendingSamples = clientSamples.filter(s=>s.status==='pending').length;
+
   const histHtml = history.length ? history.slice().reverse().map(h=>{
     const icon = {call:'📞',visit:'🚗',whatsapp:'💬',email:'📧',order:'🧾',sample:'📦',other:'📝'}[h.type]||'📝';
     const byLine = h.salesman ? ` · ${h.salesman}` : '';
@@ -2480,7 +2799,6 @@ function crmCardHTML(c){
     </div>`;
   }).join('') : '<div style="font-size:0.78rem;color:var(--ink4);padding:4px 0;">No contact history yet.</div>';
 
-  // People from settings for salesman dropdown
   const salOpts = people.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
 
   return `<div class="cc ${statusCls}" id="cc-${c.id}">
@@ -2504,14 +2822,15 @@ function crmCardHTML(c){
       ${c.salesman?`<span class="cc-tag cct-salesman">👤 ${esc(c.salesman)}</span>`:''}
       ${c.broker?`<span class="cc-tag cct-city">🤝 ${esc(c.broker)}</span>`:''}
       ${c.potential?`<span class="cc-tag cct-potential-${c.potential}">${{high:'⬆ High',med:'➡ Med',low:'⬇ Low'}[c.potential]||''} Potential</span>`:''}
-      <span class="cc-tag ${c.sample==='yes'?'cct-sample-yes':'cct-sample-no'}">${c.sample==='yes'?'✓ Sampled':'No Sample'}</span>
-      <span class="cc-tag ${c.ordered==='yes'?'cct-order-yes':'cct-order-no'}">${c.ordered==='yes'?'✓ Ordered':'No Order'}</span>
+      ${clientSamples.length?`<span class="cc-tag ${pendingSamples?'cct-sample-no':'cct-sample-yes'}">📦 ${clientSamples.length} sample${clientSamples.length>1?'s':''} ${pendingSamples?`(${pendingSamples} pending)`:'sent ✓'}</span>`:''}
+      ${c.ordered==='yes'?`<span class="cc-tag cct-order-yes">✓ Ordered</span>`:''}
       ${c.interests?`<span class="cc-tag cct-city" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${esc(c.interests)}</span>`:''}
     </div>
     <div class="cc-quick">
       <button class="cc-qbtn qb-call"  onclick="crmLogContact('${c.id}','call')">📞 Call</button>
       <button class="cc-qbtn qb-visit" onclick="crmLogContact('${c.id}','visit')">🚗 Visit</button>
-      <button class="cc-qbtn qb-visit" onclick="crmLogContact('${c.id}','whatsapp')" style="">💬 WA</button>
+      <button class="cc-qbtn"          onclick="crmLogContact('${c.id}','whatsapp')">💬 WA</button>
+      <button class="cc-qbtn"          onclick="openSampleModal('${c.id}')">📦 Sample</button>
       <button class="cc-qbtn qb-edit"  onclick="crmOpenModal('${c.id}')">✎ Edit</button>
       <button class="cc-qbtn qb-del"   onclick="crmDelete('${c.id}')">✕</button>
     </div>
@@ -2520,7 +2839,6 @@ function crmCardHTML(c){
     </button>
     <div class="cc-remarks-panel" id="crh-${c.id}">
       <div class="cc-history-log" id="chl-${c.id}">${histHtml}</div>
-      <!-- Log new contact form -->
       <div class="chl-add-form">
         <div class="chl-add-row">
           <select class="chl-type-sel" id="chl-type-${c.id}">
@@ -2544,7 +2862,7 @@ function crmCardHTML(c){
           <button class="chl-save-btn" onclick="crmSaveLog('${c.id}')">Log Contact</button>
           <div style="display:flex;gap:6px;align-items:center;font-size:0.72rem;color:var(--ink3);">
             Next follow-up:
-            <input class="chl-date-inp" type="date" id="chl-next-${c.id}" style="font-size:0.72rem;padding:4px 7px;" placeholder="Next date"/>
+            <input class="chl-date-inp" type="date" id="chl-next-${c.id}" style="font-size:0.72rem;padding:4px 7px;"/>
           </div>
         </div>
       </div>
@@ -2562,21 +2880,18 @@ function crmToggleHistory(id){
   if(arrow) arrow.textContent = open ? '▾' : '▸';
 }
 
-// ── QUICK LOG (from buttons on card) ──
+// ── QUICK LOG ──
 function crmLogContact(id, type){
-  const c = crmClients.find(x=>x.id===id);
-  if(!c) return;
-  // Open history panel and pre-select type
   const panel = document.getElementById('crh-'+id);
   if(panel && !panel.classList.contains('open')) crmToggleHistory(id);
   const sel = document.getElementById('chl-type-'+id);
   if(sel) sel.value = type;
   const noteEl = document.getElementById('chl-note-'+id);
-  if(noteEl) noteEl.focus();
+  if(noteEl) setTimeout(()=>noteEl.focus(), 300);
 }
 
 // ── SAVE LOG ENTRY ──
-function crmSaveLog(id){
+async function crmSaveLog(id){
   const c = crmClients.find(x=>x.id===id);
   if(!c) return;
   const type  = document.getElementById('chl-type-'+id)?.value||'call';
@@ -2588,32 +2903,30 @@ function crmSaveLog(id){
   if(!c.history) c.history = [];
   c.history.push({ id:crmUid(), type, note, date, salesman, ts:Date.now() });
   if(next) c.nextdate = next;
-  saveCRM();
+  await sbSaveClient(c);
   crmRender();
-  // Re-open panel after re-render
   setTimeout(()=>{ crmToggleHistory(id); },50);
   toast('Contact logged ✓');
 }
 
-// ── DELETE ──
+// ── DELETE CLIENT ──
 function crmDelete(id){
   const c = crmClients.find(x=>x.id===id);
   if(!c) return;
-  customConfirm(`Delete <strong>${esc(c.name)}</strong> from your client database?`, ()=>{
+  customConfirm(`Delete <strong>${esc(c.name)}</strong> from your client database?`, async ()=>{
     crmClients = crmClients.filter(x=>x.id!==id);
-    saveCRM(); crmRender(); toast('Client deleted');
+    await sbDeleteClient(id);
+    crmRender(); toast('Client deleted');
   });
 }
 
 // ── MODAL OPEN ──
 function crmOpenModal(id){
   crmEditId = id||null;
-  const modal = document.getElementById('crmModal');
   const overlay = document.getElementById('crmModalOverlay');
   const title = document.getElementById('crmModalTitle');
-
-  const fields = ['name','contact','phone','city','type','status','salesman','broker','potential','sample','ordered','nextdate','interests','remarks'];
-  const defaults = {type:'party',status:'warm',potential:'med',sample:'no',ordered:'no'};
+  const fields = ['name','contact','phone','city','type','status','salesman','broker','potential','ordered','nextdate','interests','remarks'];
+  const defaults = {type:'party',status:'warm',potential:'med',ordered:'no'};
 
   if(id){
     const c = crmClients.find(x=>x.id===id);
@@ -2635,38 +2948,184 @@ function crmCloseModal(e){
 }
 
 // ── MODAL SAVE ──
-
 async function crmSaveModal(){
   const name = document.getElementById('cm_name').value.trim();
   if(!name){ toast('Party name is required'); return; }
-  const fields = ['name','contact','phone','city','type','status','salesman','broker','potential','sample','ordered','nextdate','interests','remarks'];
+  const fields = ['name','contact','phone','city','type','status','salesman','broker','potential','ordered','nextdate','interests','remarks'];
   const data = {};
   fields.forEach(f=>{ data[f] = document.getElementById('cm_'+f)?.value||''; });
   data.name = name;
 
-  // Cloud Save
-  const { error } = await _supabase.from('clients').upsert([data], { onConflict: 'name' });
-
-  if(error) {
-    toast('Cloud Error: ' + error.message);
-  } else {
-    toast('Saved to Cloud');
-    crmCloseModal();
-    loadCloudData();
-  }
-}
-
-function originalCrmSaveModal_Old(){
   if(crmEditId){
     const idx = crmClients.findIndex(c=>c.id===crmEditId);
-    if(idx>-1){ crmClients[idx] = {...crmClients[idx], ...data}; }
+    if(idx>-1){ crmClients[idx] = {...crmClients[idx], ...data}; await sbSaveClient(crmClients[idx]); }
   } else {
-    crmClients.unshift({ id:crmUid(), ...data, history:[], createdAt:Date.now() });
+    const newClient = { id:crmUid(), ...data, history:[], createdAt:Date.now() };
+    crmClients.unshift(newClient);
+    await sbSaveClient(newClient);
   }
-  saveCRM(); crmRender();
+  crmRender();
   document.getElementById('crmModalOverlay').classList.remove('open');
   crmEditId = null;
   toast(crmEditId?'Client updated ✓':'Client added ✓');
+}
+
+// ══════════════════════════════════════
+// SAMPLES
+// ══════════════════════════════════════
+function crmToggleSamples(){
+  samplesOpen = !samplesOpen;
+  document.getElementById('cssSamplesBody').classList.toggle('open', samplesOpen);
+  const arrow = document.getElementById('cssArrow');
+  if(arrow) arrow.classList.toggle('open', samplesOpen);
+}
+
+function renderSamples(){
+  const total = crmSamples.length;
+  const pending = crmSamples.filter(s=>s.status==='pending').length;
+  document.getElementById('cssTotalCount').textContent = total;
+  document.getElementById('cssPendingCount').textContent = pending ? `${pending} pending` : '';
+
+  const list = document.getElementById('cssSamplesList');
+  if(!total){
+    list.innerHTML = `<div style="padding:16px 18px;font-size:0.82rem;color:var(--ink4);">No sample requests logged yet. Use the "📦 Sample" button on any client card, or click below.</div>`;
+    return;
+  }
+
+  // Sort: pending first, then by dateRequested desc
+  const sorted = [...crmSamples].sort((a,b)=>{
+    if((a.status==='pending')!==(b.status==='pending')) return a.status==='pending'?-1:1;
+    return (b.dateRequested||'').localeCompare(a.dateRequested||'');
+  });
+
+  list.innerHTML = sorted.map(s=>{
+    const client = crmClients.find(c=>c.id===s.clientId);
+    const clientName = client ? client.name : (s.clientName||'Unknown');
+    const isSent = s.status==='sent';
+    return `<div class="css-row" id="cssr-${s.id}">
+      <div class="css-check ${isSent?'checked':''}" onclick="toggleSampleSent('${s.id}')" title="${isSent?'Mark pending':'Mark sent'}">
+        ${isSent?'✓':''}
+      </div>
+      <div class="css-row-body">
+        <div class="css-row-desc ${isSent?'sent-through':''}">${esc(s.description||'—')}</div>
+        <div class="css-row-meta">
+          <span class="css-client-tag">${esc(clientName)}</span>
+          <span class="css-status-tag ${isSent?'css-st-sent':'css-st-pending'}">${isSent?'✅ Sent':'⏳ Pending'}</span>
+          ${s.qty?`<span class="css-row-qty">${esc(s.qty)}</span>`:''}
+          ${s.salesman?`<span class="css-row-sal">👤 ${esc(s.salesman)}</span>`:''}
+          ${s.dateRequested?`<span class="css-row-date">Req: ${fmtDate(s.dateRequested)}</span>`:''}
+          ${s.dateSent?`<span class="css-row-date">Sent: ${fmtDate(s.dateSent)}</span>`:''}
+        </div>
+        ${s.remarks?`<div class="css-remarks">${esc(s.remarks)}</div>`:''}
+      </div>
+      <div class="css-row-actions">
+        ${!isSent?`<button class="css-ra mark-sent" onclick="toggleSampleSent('${s.id}')">Mark Sent</button>`:''}
+        <button class="css-ra del-sample" onclick="deleteSample('${s.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleSampleSent(id){
+  const s = crmSamples.find(x=>x.id===id);
+  if(!s) return;
+  if(s.status==='pending'){
+    s.status = 'sent';
+    s.dateSent = s.dateSent || todayStr();
+  } else {
+    s.status = 'pending';
+    s.dateSent = '';
+  }
+  await sbSaveSample(s);
+  renderSamples();
+  crmUpdateStats();
+  toast(s.status==='sent'?'Sample marked sent ✓':'Marked pending');
+}
+
+function deleteSample(id){
+  const s = crmSamples.find(x=>x.id===id);
+  if(!s) return;
+  customConfirm('Delete this sample request?', async ()=>{
+    crmSamples = crmSamples.filter(x=>x.id!==id);
+    await sbDeleteSample(id);
+    renderSamples();
+    crmUpdateStats();
+    toast('Sample deleted');
+  });
+}
+
+function openSampleModal(prefillClientId){
+  sampleEditId = null;
+  document.getElementById('sampleModalTitle').textContent = 'Log Sample Request';
+
+  // Populate client dropdown
+  const sel = document.getElementById('sm_clientId');
+  sel.innerHTML = '<option value="">— Select client —</option>' +
+    crmClients.map(c=>`<option value="${c.id}"${c.id===prefillClientId?' selected':''}>${esc(c.name)}</option>`).join('');
+
+  // Prefill salesman from selected client
+  if(prefillClientId){
+    const c = crmClients.find(x=>x.id===prefillClientId);
+    document.getElementById('sm_salesman').value = c?.salesman||'';
+  } else {
+    document.getElementById('sm_salesman').value = '';
+  }
+
+  document.getElementById('sm_description').value = '';
+  document.getElementById('sm_qty').value = '';
+  document.getElementById('sm_status').value = 'pending';
+  document.getElementById('sm_dateRequested').value = todayStr();
+  document.getElementById('sm_dateSent').value = '';
+  document.getElementById('sm_remarks').value = '';
+  document.getElementById('sm_dateSentField').style.display = 'none';
+
+  document.getElementById('sampleModalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('sm_description').focus(), 100);
+}
+
+// Show/hide date sent field based on status select
+document.addEventListener('DOMContentLoaded',()=>{
+  const statusSel = document.getElementById('sm_status');
+  if(statusSel) statusSel.addEventListener('change', ()=>{
+    document.getElementById('sm_dateSentField').style.display = statusSel.value==='sent'?'':'none';
+  });
+});
+
+function closeSampleModal(e){
+  if(e && e.target!==document.getElementById('sampleModalOverlay')) return;
+  document.getElementById('sampleModalOverlay').classList.remove('open');
+}
+
+async function saveSampleModal(){
+  const clientId = document.getElementById('sm_clientId').value;
+  const desc     = document.getElementById('sm_description').value.trim();
+  if(!clientId){ toast('Select a client first'); return; }
+  if(!desc)    { toast('Sample description is required'); return; }
+
+  const client = crmClients.find(c=>c.id===clientId);
+  const s = {
+    id:           crmUid().replace('c','s'),
+    clientId,
+    clientName:   client?.name||'',
+    description:  desc,
+    qty:          document.getElementById('sm_qty').value.trim(),
+    salesman:     document.getElementById('sm_salesman').value.trim(),
+    status:       document.getElementById('sm_status').value,
+    dateRequested:document.getElementById('sm_dateRequested').value,
+    dateSent:     document.getElementById('sm_dateSent').value,
+    remarks:      document.getElementById('sm_remarks').value.trim(),
+    createdAt:    Date.now()
+  };
+
+  crmSamples.push(s);
+  await sbSaveSample(s);
+
+  // Auto-open samples section
+  if(!samplesOpen) crmToggleSamples();
+
+  closeSampleModal();
+  crmRender();
+  toast('Sample request logged ✓');
 }
 
 boot();
