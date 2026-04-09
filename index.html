@@ -607,6 +607,175 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 /* ══════════════════════════════
+   CRM PAGE
+══════════════════════════════ */
+.crm-layout{display:flex;flex-direction:column;min-height:calc(100vh - 140px);}
+.crm-topbar{background:var(--white);border-bottom:1.5px solid var(--rule);padding:12px 16px 10px;display:flex;flex-direction:column;gap:10px;position:sticky;top:0;z-index:30;}
+.crm-toprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.crm-search-wrap{flex:1;min-width:160px;display:flex;align-items:center;gap:8px;background:var(--cream2);border:1.5px solid var(--rule);border-radius:9px;padding:8px 13px;transition:border-color .2s;}
+.crm-search-wrap:focus-within{border-color:var(--gold-bd);}
+.crm-search-wrap svg{color:var(--ink4);flex-shrink:0;}
+#crmSearch{flex:1;border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--ink);}
+#crmSearch::placeholder{color:var(--ink4);}
+.crm-add-btn{flex-shrink:0;padding:8px 16px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.crm-add-btn:hover{background:var(--ink2);}
+.crm-filter-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:1px 0;}
+.crm-filter-chips::-webkit-scrollbar{display:none;}
+.crm-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--rule2);background:var(--white);color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.crm-chip:hover{border-color:var(--rule);color:var(--ink);}
+.crm-chip.ca{background:var(--ink);border-color:var(--ink);color:#fff;}
+.crm-chip.ca-green{background:var(--bg-green);border-color:var(--bd-green);color:var(--c-green);}
+.crm-chip.ca-amber{background:var(--bg-amber);border-color:var(--bd-amber);color:var(--c-amber);}
+.crm-chip.ca-red{background:var(--bg-red);border-color:var(--bd-red);color:var(--c-red);}
+.crm-chip.ca-blue{background:var(--bg-blue);border-color:var(--bd-blue);color:var(--c-blue);}
+
+/* Stats row */
+.crm-stats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:10px 16px;background:var(--cream2);border-bottom:1.5px solid var(--rule);}
+.crm-stats::-webkit-scrollbar{display:none;}
+.crm-stat{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:8px 16px;background:var(--white);border:1.5px solid var(--rule);border-radius:10px;min-width:80px;}
+.crm-stat-num{font-family:'Lora',serif;font-size:1.3rem;font-weight:500;color:var(--ink);line-height:1;}
+.crm-stat-lbl{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);margin-top:3px;white-space:nowrap;}
+.crm-stat.cs-green .crm-stat-num{color:var(--c-green);}
+.crm-stat.cs-amber .crm-stat-num{color:var(--c-amber);}
+.crm-stat.cs-red .crm-stat-num{color:var(--c-red);}
+.crm-stat.cs-blue .crm-stat-num{color:var(--c-blue);}
+
+/* Client list */
+.crm-list{padding:14px 16px 140px;display:flex;flex-direction:column;gap:10px;}
+
+/* Client card */
+.cc{background:var(--white);border:1.5px solid var(--rule);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;cursor:pointer;transition:box-shadow .15s,border-color .15s;animation:noteIn .2s ease;}
+.cc:hover{box-shadow:var(--sh2);border-color:var(--rule2);}
+.cc.cc-hot{border-left:4px solid var(--c-green);}
+.cc.cc-warm{border-left:4px solid var(--gold2);}
+.cc.cc-cold{border-left:4px solid var(--c-blue);}
+.cc.cc-inactive{border-left:4px solid var(--ink4);opacity:.7;}
+.cc-main{display:flex;align-items:flex-start;padding:12px 14px;gap:12px;}
+.cc-avatar{width:36px;height:36px;border-radius:50%;background:var(--cream3);border:1.5px solid var(--rule2);display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-weight:600;font-size:0.9rem;color:var(--ink3);flex-shrink:0;text-transform:uppercase;}
+.cc-info{flex:1;min-width:0;}
+.cc-name{font-family:'Lora',serif;font-size:0.97rem;font-weight:600;color:var(--ink);line-height:1.2;}
+.cc-sub{font-size:0.72rem;color:var(--ink3);margin-top:2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cc-type-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:0.62rem;font-weight:600;letter-spacing:0.05em;border:1px solid;text-transform:uppercase;white-space:nowrap;}
+.ctb-party{background:var(--bg-purple);color:var(--c-purple);border-color:var(--bd-purple);}
+.ctb-broker{background:var(--bg-teal);color:var(--c-teal);border-color:var(--bd-teal);}
+.ctb-agent{background:var(--bg-orange);color:var(--c-orange);border-color:var(--bd-orange);}
+.ctb-direct{background:var(--bg-blue);color:var(--c-blue);border-color:var(--bd-blue);}
+.cc-status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:1px;}
+.csd-hot{background:var(--c-green);}
+.csd-warm{background:var(--gold2);}
+.csd-cold{background:var(--c-blue);}
+.csd-inactive{background:var(--ink4);}
+.cc-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.cc-last-contact{font-size:0.65rem;color:var(--ink4);white-space:nowrap;}
+.cc-next-badge{font-size:0.62rem;padding:2px 8px;border-radius:4px;border:1px solid;white-space:nowrap;}
+.cnb-due{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);}
+.cnb-overdue{background:var(--bg-red);color:var(--c-red);border-color:var(--bd-red);}
+.cnb-ok{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
+.cnb-none{background:var(--cream2);color:var(--ink4);border-color:var(--rule2);}
+
+/* Tags row */
+.cc-tags{display:flex;align-items:center;gap:6px;padding:0 14px 10px;flex-wrap:wrap;}
+.cc-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:0.63rem;font-weight:500;border:1px solid;white-space:nowrap;}
+.cct-sample-yes{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
+.cct-sample-no {background:var(--cream2);color:var(--ink4);border-color:var(--rule2);}
+.cct-order-yes {background:var(--bg-teal);color:var(--c-teal);border-color:var(--bd-teal);}
+.cct-order-no  {background:var(--cream2);color:var(--ink4);border-color:var(--rule2);}
+.cct-salesman  {background:var(--bg-blue);color:var(--c-blue);border-color:var(--bd-blue);}
+.cct-city      {background:var(--cream3);color:var(--ink3);border-color:var(--rule2);}
+.cct-potential-high{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
+.cct-potential-med {background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);}
+.cct-potential-low {background:var(--cream2);color:var(--ink4);border-color:var(--rule2);}
+
+/* Quick action row */
+.cc-quick{display:flex;gap:6px;padding:0 14px 12px;border-top:1px solid var(--rule);padding-top:10px;}
+.cc-qbtn{flex:1;padding:7px 6px;border:1.5px solid var(--rule2);border-radius:7px;background:none;font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:500;color:var(--ink3);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;}
+.cc-qbtn:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
+.cc-qbtn.qb-call:hover{border-color:var(--bd-green);color:var(--c-green);background:var(--bg-green);}
+.cc-qbtn.qb-visit:hover{border-color:var(--bd-blue);color:var(--c-blue);background:var(--bg-blue);}
+.cc-qbtn.qb-edit:hover{border-color:var(--bd-purple);color:var(--c-purple);background:var(--bg-purple);}
+.cc-qbtn.qb-del:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
+
+/* Remarks / history toggle */
+.cc-remarks-btn{width:100%;padding:8px 14px;border:none;background:none;border-top:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:0.72rem;color:var(--ink4);cursor:pointer;text-align:left;display:flex;align-items:center;gap:6px;transition:color .15s;}
+.cc-remarks-btn:hover{color:var(--ink2);}
+.cc-remarks-panel{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;}
+.cc-remarks-panel.open{max-height:600px;padding:0 14px 12px;}
+
+/* History log */
+.cc-history-log{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.chl-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--cream2);border-radius:8px;border:1px solid var(--rule);}
+.chl-icon{font-size:0.8rem;flex-shrink:0;margin-top:1px;}
+.chl-body{flex:1;min-width:0;}
+.chl-action{font-size:0.78rem;color:var(--ink);font-weight:500;}
+.chl-meta{font-size:0.63rem;color:var(--ink4);margin-top:1px;}
+.chl-note{font-size:0.75rem;color:var(--ink2);margin-top:3px;line-height:1.4;}
+.chl-add-form{display:flex;flex-direction:column;gap:7px;background:var(--cream2);border-radius:9px;padding:10px;border:1px solid var(--rule);}
+.chl-add-row{display:flex;gap:7px;flex-wrap:wrap;}
+.chl-type-sel,.chl-sal-sel{flex:1;min-width:110px;padding:6px 9px;border:1.5px solid var(--rule2);border-radius:7px;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--ink);outline:none;cursor:pointer;}
+.chl-note-inp{width:100%;padding:7px 10px;border:1.5px solid var(--rule2);border-radius:7px;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--ink);outline:none;resize:none;}
+.chl-note-inp:focus,.chl-type-sel:focus,.chl-sal-sel:focus{border-color:var(--gold-bd);}
+.chl-date-inp{padding:6px 9px;border:1.5px solid var(--rule2);border-radius:7px;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--ink);outline:none;min-width:130px;}
+.chl-date-inp:focus{border-color:var(--gold-bd);}
+.chl-save-btn{padding:6px 14px;background:var(--ink);color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.chl-save-btn:hover{background:var(--ink2);}
+.crm-remarks-ta{width:100%;padding:7px 10px;border:1.5px solid var(--rule2);border-radius:7px;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.8rem;color:var(--ink);outline:none;resize:none;line-height:1.5;}
+.crm-remarks-ta:focus{border-color:var(--gold-bd);}
+.crm-save-remarks{padding:6px 14px;background:var(--ink);color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:background .15s;}
+.crm-save-remarks:hover{background:var(--ink2);}
+
+/* Add/Edit client modal overlay */
+.crm-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:flex-end;justify-content:center;}
+.crm-modal-overlay.open{display:flex;}
+.crm-modal{background:var(--white);border-radius:var(--rlg) var(--rlg) 0 0;width:100%;max-width:620px;max-height:92vh;overflow-y:auto;padding:20px 20px 40px;display:flex;flex-direction:column;gap:16px;}
+.crm-modal-hd{display:flex;align-items:center;justify-content:space-between;}
+.crm-modal-title{font-family:'Lora',serif;font-size:1.05rem;font-weight:600;color:var(--ink);}
+.crm-modal-close{width:30px;height:30px;border:none;background:var(--cream2);border-radius:7px;font-size:1rem;cursor:pointer;color:var(--ink3);display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.crm-modal-close:hover{background:var(--cream3);}
+.crm-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.crm-modal-field{display:flex;flex-direction:column;gap:5px;}
+.crm-modal-field.full{grid-column:1/-1;}
+.crm-modal-lbl{font-size:0.7rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink3);}
+.crm-modal-input,.crm-modal-select,.crm-modal-ta{width:100%;padding:9px 11px;border:1.5px solid var(--rule2);border-radius:8px;background:var(--cream2);font-family:'DM Sans',sans-serif;font-size:0.87rem;color:var(--ink);outline:none;transition:border-color .2s;}
+.crm-modal-input:focus,.crm-modal-select:focus,.crm-modal-ta:focus{border-color:var(--gold-bd);background:var(--white);}
+.crm-modal-ta{resize:none;line-height:1.5;}
+.crm-modal-actions{display:flex;gap:9px;margin-top:6px;}
+.crm-modal-save{flex:1;padding:11px;background:var(--ink);color:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background .15s;}
+.crm-modal-save:hover{background:var(--ink2);}
+.crm-modal-cancel{padding:11px 20px;border:1.5px solid var(--rule2);border-radius:9px;background:none;color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;transition:all .15s;}
+.crm-modal-cancel:hover{background:var(--cream2);}
+.crm-empty{text-align:center;padding:60px 20px;}
+.crm-empty-icon{font-family:'Lora',serif;font-style:italic;font-size:2rem;color:var(--rule2);margin-bottom:10px;}
+.crm-empty p{font-size:0.84rem;color:var(--ink4);}
+
+/* Dark mode CRM adjustments */
+[data-theme="dark"] .crm-modal{background:var(--white);}
+[data-theme="dark"] .crm-modal-input,[data-theme="dark"] .crm-modal-select,[data-theme="dark"] .crm-modal-ta{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] .crm-modal-input:focus,[data-theme="dark"] .crm-modal-select:focus,[data-theme="dark"] .crm-modal-ta:focus{background:var(--cream3);border-color:var(--gold-bd);}
+[data-theme="dark"] .crm-modal-save{background:#2C2820;color:var(--ink);border:1.5px solid #4A4438;}
+[data-theme="dark"] .crm-modal-save:hover{background:#3A3528;}
+[data-theme="dark"] .crm-modal-cancel{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
+[data-theme="dark"] .chl-add-form{background:var(--cream3);}
+[data-theme="dark"] .chl-type-sel,[data-theme="dark"] .chl-sal-sel,[data-theme="dark"] .chl-note-inp,[data-theme="dark"] .chl-date-inp{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] .chl-note-inp:focus,[data-theme="dark"] .chl-type-sel:focus,[data-theme="dark"] .chl-sal-sel:focus,[data-theme="dark"] .chl-date-inp:focus{border-color:var(--gold-bd);}
+[data-theme="dark"] .crm-remarks-ta{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] .chl-item{background:var(--cream3);border-color:var(--rule2);}
+[data-theme="dark"] .crm-add-btn,[data-theme="dark"] .chl-save-btn,[data-theme="dark"] .crm-save-remarks{background:#2C2820;color:var(--ink);border:1.5px solid #4A4438;}
+[data-theme="dark"] .crm-add-btn:hover,[data-theme="dark"] .chl-save-btn:hover,[data-theme="dark"] .crm-save-remarks:hover{background:#3A3528;}
+[data-theme="dark"] .crm-stat{background:var(--white);border-color:var(--rule2);}
+[data-theme="dark"] .crm-search-wrap{background:var(--cream2);}
+[data-theme="dark"] .crm-modal-close{background:var(--cream3);color:var(--ink3);}
+
+@media(min-width:900px){
+  .crm-topbar{padding:14px 28px 12px;}
+  .crm-list{padding:16px 28px 80px;}
+  .crm-stats{padding:10px 28px;}
+  .crm-modal{border-radius:var(--rlg);max-height:80vh;}
+  .crm-modal-overlay{align-items:center;}
+  .cc-quick{opacity:0;transition:opacity .15s;}
+  .cc:hover .cc-quick{opacity:1;}
+}
+
+/* ══════════════════════════════
    DESKTOP
 ══════════════════════════════ */
 @media(min-width:900px){
@@ -666,6 +835,9 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
     </button>
     <button class="tab-btn" onclick="switchTab('notes')">
       <span class="tab-icon">💡</span> Notes
+    </button>
+    <button class="tab-btn" onclick="switchTab('crm')">
+      <span class="tab-icon">🤝</span> Clients
     </button>
     <button class="tab-btn" onclick="switchTab('settings')">
       <span class="tab-icon">⚙</span> Settings
@@ -764,6 +936,138 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
     <button class="bb bb-clear" onclick="clearDone()">✕ Clear Completed</button>
   </div>
 </div><!-- /page-today -->
+
+<!-- ═══════ CRM PAGE ═══════ -->
+<div class="page" id="page-crm">
+  <!-- Top bar: search + add -->
+  <div class="crm-topbar">
+    <div class="crm-toprow">
+      <div class="crm-search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.4-4.4"/></svg>
+        <input type="text" id="crmSearch" placeholder="Search clients, city, broker, salesman…" oninput="crmRender()" autocomplete="off"/>
+      </div>
+      <button class="crm-add-btn" onclick="crmOpenModal()">+ Add Client</button>
+    </div>
+    <div class="crm-filter-chips" id="crmFilterChips">
+      <button class="crm-chip ca" data-f="all"      onclick="crmSetFilter(this,'all')">All</button>
+      <button class="crm-chip"   data-f="party"     onclick="crmSetFilter(this,'party')">🏭 Party</button>
+      <button class="crm-chip"   data-f="broker"    onclick="crmSetFilter(this,'broker')">🤝 Broker</button>
+      <button class="crm-chip"   data-f="agent"     onclick="crmSetFilter(this,'agent')">📞 Agent</button>
+      <button class="crm-chip"   data-f="direct"    onclick="crmSetFilter(this,'direct')">🛒 Direct</button>
+      <button class="crm-chip"   data-f="hot"       onclick="crmSetFilter(this,'hot')">🔥 Hot</button>
+      <button class="crm-chip"   data-f="warm"      onclick="crmSetFilter(this,'warm')">🌤 Warm</button>
+      <button class="crm-chip"   data-f="cold"      onclick="crmSetFilter(this,'cold')">❄ Cold</button>
+      <button class="crm-chip"   data-f="overdue"   onclick="crmSetFilter(this,'overdue')">⚠ Overdue</button>
+      <button class="crm-chip"   data-f="new"       onclick="crmSetFilter(this,'new')">🆕 New/Untapped</button>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="crm-stats" id="crmStats">
+    <div class="crm-stat"><div class="crm-stat-num" id="cst-total">0</div><div class="crm-stat-lbl">Total</div></div>
+    <div class="crm-stat cs-green"><div class="crm-stat-num" id="cst-hot">0</div><div class="crm-stat-lbl">Hot</div></div>
+    <div class="crm-stat cs-amber"><div class="crm-stat-num" id="cst-warm">0</div><div class="crm-stat-lbl">Warm</div></div>
+    <div class="crm-stat cs-blue"><div class="crm-stat-num" id="cst-cold">0</div><div class="crm-stat-lbl">Cold</div></div>
+    <div class="crm-stat cs-red"><div class="crm-stat-num" id="cst-overdue">0</div><div class="crm-stat-lbl">Overdue</div></div>
+    <div class="crm-stat"><div class="crm-stat-num" id="cst-sampled">0</div><div class="crm-stat-lbl">Sampled</div></div>
+    <div class="crm-stat cs-green"><div class="crm-stat-num" id="cst-ordered">0</div><div class="crm-stat-lbl">Ordered</div></div>
+  </div>
+
+  <!-- Client list -->
+  <div class="crm-list" id="crmList"></div>
+</div>
+
+<!-- CRM Add/Edit Modal -->
+<div class="crm-modal-overlay" id="crmModalOverlay" onclick="crmCloseModal(event)">
+  <div class="crm-modal" id="crmModal">
+    <div class="crm-modal-hd">
+      <div class="crm-modal-title" id="crmModalTitle">Add Client</div>
+      <button class="crm-modal-close" onclick="crmCloseModal()">✕</button>
+    </div>
+    <div class="crm-modal-grid">
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Party / Firm Name *</div>
+        <input class="crm-modal-input" id="cm_name" type="text" placeholder="e.g. Mehta Sarees"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Contact Person</div>
+        <input class="crm-modal-input" id="cm_contact" type="text" placeholder="e.g. Rajesh Mehta"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Phone</div>
+        <input class="crm-modal-input" id="cm_phone" type="tel" placeholder="e.g. 98765 43210"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">City / Market</div>
+        <input class="crm-modal-input" id="cm_city" type="text" placeholder="e.g. Surat, Bhiwandi"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Type</div>
+        <select class="crm-modal-select" id="cm_type">
+          <option value="party">🏭 Party</option>
+          <option value="broker">🤝 Broker</option>
+          <option value="agent">📞 Agent</option>
+          <option value="direct">🛒 Direct Buyer</option>
+        </select>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Status</div>
+        <select class="crm-modal-select" id="cm_status">
+          <option value="hot">🔥 Hot</option>
+          <option value="warm">🌤 Warm</option>
+          <option value="cold">❄ Cold</option>
+          <option value="inactive">⚪ Inactive</option>
+        </select>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Assigned Salesman</div>
+        <input class="crm-modal-input" id="cm_salesman" type="text" placeholder="e.g. Avinash"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Broker (if any)</div>
+        <input class="crm-modal-input" id="cm_broker" type="text" placeholder="e.g. Dhruv Textiles"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Potential</div>
+        <select class="crm-modal-select" id="cm_potential">
+          <option value="high">⬆ High</option>
+          <option value="med">➡ Medium</option>
+          <option value="low">⬇ Low</option>
+        </select>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Sample Sent?</div>
+        <select class="crm-modal-select" id="cm_sample">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Ordered Before?</div>
+        <select class="crm-modal-select" id="cm_ordered">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Next Follow-up Date</div>
+        <input class="crm-modal-input" id="cm_nextdate" type="date"/>
+      </div>
+      <div class="crm-modal-field full">
+        <div class="crm-modal-lbl">Interests / Products Discussed</div>
+        <input class="crm-modal-input" id="cm_interests" type="text" placeholder="e.g. Viscose 60s, Dobby fabrics"/>
+      </div>
+      <div class="crm-modal-field full">
+        <div class="crm-modal-lbl">Initial Remarks</div>
+        <textarea class="crm-modal-ta" id="cm_remarks" rows="2" placeholder="Anything worth noting about this client…"></textarea>
+      </div>
+    </div>
+    <div class="crm-modal-actions">
+      <button class="crm-modal-save" onclick="crmSaveModal()">Save Client</button>
+      <button class="crm-modal-cancel" onclick="crmCloseModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════ SETTINGS PAGE ═══════ -->
 <div class="page" id="page-settings">
@@ -996,7 +1300,14 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+const supabase = window.supabase.createClient(
+  'https://lwaqwxsvgdghekzmanvy.supabase.co',
+  'sb_publishable_d4HMHHfzlfcTF0-_ZAIi9w_ffXgnxoV'
+);
+
 // ══════════════════════════════════════
 // CONSTANTS & PALETTE
 // ══════════════════════════════════════
@@ -1069,28 +1380,49 @@ const DEFAULT_TPLS=[
 // ══════════════════════════════════════
 // LOAD / SAVE
 // ══════════════════════════════════════
-function load(){
-  tasks     = JSON.parse(localStorage.getItem(K.tasks)  || 'null') || JSON.parse(JSON.stringify(DEFAULT_TASKS));
-  depts     = JSON.parse(localStorage.getItem(K.depts)  || 'null') || JSON.parse(JSON.stringify(DEFAULT_DEPTS));
-  people    = JSON.parse(localStorage.getItem(K.people) || 'null') || JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
-  templates = JSON.parse(localStorage.getItem(K.tpls)   || 'null') || JSON.parse(JSON.stringify(DEFAULT_TPLS));
+async function load(){
+  const { data, error } = await supabase
+    .from('app_state')
+    .select('data')
+    .eq('id', 'main')
+    .single();
+
+  const saved = data?.data || {};
+
+  tasks = saved.tasks || JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  depts = saved.depts || JSON.parse(JSON.stringify(DEFAULT_DEPTS));
+  people = saved.people || JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
+  templates = saved.templates || JSON.parse(JSON.stringify(DEFAULT_TPLS));
+  notes = saved.notes || [];
+  crmClients = saved.crmClients || [];
 }
-function persist(){
-  localStorage.setItem(K.tasks, JSON.stringify(tasks));
-  localStorage.setItem(K.depts, JSON.stringify(depts));
-  localStorage.setItem(K.people,JSON.stringify(people));
-  localStorage.setItem(K.tpls,  JSON.stringify(templates));
+
+async function persist(){
+  await supabase
+    .from('app_state')
+    .upsert({
+      id: 'main',
+      data: {
+        tasks,
+        depts,
+        people,
+        templates,
+        notes,
+        crmClients
+      }
+    });
 }
 
 // ══════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════
-function boot(){
-  load();
+async function boot(){
+  await load();
   document.getElementById('dateEl').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
   rebuildAll();
   render();
   initNotes();
+  loadCRM();
   initDarkMode();
 }
 
@@ -1746,13 +2078,14 @@ function resetAll(){
 // ══════════════════════════════════════
 function switchTab(tab){
   currentTab=tab;
-  const tabNames=['today','notes','settings'];
+  const tabNames=['today','notes','crm','settings'];
   document.querySelectorAll('.tab-btn').forEach((b,i)=>{
     b.classList.toggle('active', tabNames[i]===tab);
   });
   document.getElementById('page-today').classList.toggle('active',tab==='today');
   document.getElementById('page-notes').classList.toggle('active',tab==='notes');
   document.getElementById('page-settings').classList.toggle('active',tab==='settings');
+  document.getElementById('page-crm').classList.toggle('active',tab==='crm');
   document.getElementById('statsBar').style.display=tab==='today'?'flex':'none';
   document.getElementById('botBar').style.display=tab==='today'?'flex':'none';
   document.getElementById('hdrRight').style.display=tab==='today'?'block':'none';
@@ -1764,6 +2097,9 @@ function switchTab(tab){
   }
   if(tab==='notes'){
     renderNotes();
+  }
+  if(tab==='crm'){
+    crmRender();
   }
 }
 
@@ -2011,6 +2347,324 @@ function toggleDarkMode(){
 function applyTheme(){
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
   document.getElementById('dmToggle').textContent = isDark ? '☀️' : '🌙';
+}
+
+// ══════════════════════════════════════
+// CRM — CLIENTS & SALES TRACKER
+// ══════════════════════════════════════
+const CRM_KEY = 'nk_crm_v1';
+let crmClients = [];
+let crmFilter  = 'all';
+let crmEditId  = null;
+
+function loadCRM(){ try{ crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]'); }catch(e){ crmClients=[]; } }
+function saveCRM(){ localStorage.setItem(CRM_KEY, JSON.stringify(crmClients)); }
+
+function crmUid(){ return 'c'+Date.now()+'_'+Math.random().toString(36).slice(2,6); }
+
+// ── FILTER ──
+function crmSetFilter(el, f){
+  crmFilter = f;
+  document.querySelectorAll('.crm-chip').forEach(c=>{
+    c.className = 'crm-chip';
+    if(c.dataset.f===f){
+      if(f==='hot') c.classList.add('ca-green');
+      else if(f==='warm') c.classList.add('ca-amber');
+      else if(f==='cold') c.classList.add('ca-blue');
+      else if(f==='overdue') c.classList.add('ca-red');
+      else c.classList.add('ca');
+    }
+  });
+  crmRender();
+}
+
+function crmApplyFilter(clients){
+  const q = (document.getElementById('crmSearch')?.value||'').toLowerCase();
+  const today = todayStr();
+  return clients.filter(c=>{
+    if(crmFilter==='party'   && c.type!=='party')   return false;
+    if(crmFilter==='broker'  && c.type!=='broker')  return false;
+    if(crmFilter==='agent'   && c.type!=='agent')   return false;
+    if(crmFilter==='direct'  && c.type!=='direct')  return false;
+    if(crmFilter==='hot'     && c.status!=='hot')   return false;
+    if(crmFilter==='warm'    && c.status!=='warm')  return false;
+    if(crmFilter==='cold'    && c.status!=='cold')  return false;
+    if(crmFilter==='overdue' && !isOverdue(c))      return false;
+    if(crmFilter==='new'     && (c.history||[]).length > 0) return false;
+    if(q){
+      const hay = [c.name,c.contact,c.city,c.salesman,c.broker,c.interests,c.remarks].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function todayStr(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+function isOverdue(c){
+  if(!c.nextdate) return false;
+  return c.nextdate < todayStr();
+}
+
+function nextBadge(c){
+  if(!c.nextdate) return {cls:'cnb-none',txt:'No follow-up set'};
+  const today = todayStr();
+  if(c.nextdate < today) return {cls:'cnb-overdue',txt:'⚠ Overdue: '+fmtDate(c.nextdate)};
+  const daysLeft = Math.round((new Date(c.nextdate)-new Date(today))/86400000);
+  if(daysLeft <= 3) return {cls:'cnb-due',txt:'Due in '+daysLeft+'d'};
+  return {cls:'cnb-ok',txt:'Next: '+fmtDate(c.nextdate)};
+}
+
+function fmtDate(s){
+  if(!s) return '';
+  const d = new Date(s+'T00:00:00');
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+
+function fmtDateTime(ts){
+  if(!ts) return '';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + ', ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+function lastContact(c){
+  const h = c.history||[];
+  if(!h.length) return '—';
+  const last = h[h.length-1];
+  return fmtDate(last.date||last.ts?.toString().slice(0,10)||'');
+}
+
+// ── STATS ──
+function crmUpdateStats(){
+  const today = todayStr();
+  document.getElementById('cst-total').textContent   = crmClients.length;
+  document.getElementById('cst-hot').textContent     = crmClients.filter(c=>c.status==='hot').length;
+  document.getElementById('cst-warm').textContent    = crmClients.filter(c=>c.status==='warm').length;
+  document.getElementById('cst-cold').textContent    = crmClients.filter(c=>c.status==='cold').length;
+  document.getElementById('cst-overdue').textContent = crmClients.filter(c=>isOverdue(c)).length;
+  document.getElementById('cst-sampled').textContent = crmClients.filter(c=>c.sample==='yes').length;
+  document.getElementById('cst-ordered').textContent = crmClients.filter(c=>c.ordered==='yes').length;
+}
+
+// ── RENDER ──
+function crmRender(){
+  crmUpdateStats();
+  const filtered = crmApplyFilter(crmClients);
+  // Sort: overdue first, then by nextdate, then by name
+  filtered.sort((a,b)=>{
+    if(isOverdue(a)!==isOverdue(b)) return isOverdue(a)?-1:1;
+    if(a.nextdate && b.nextdate) return a.nextdate.localeCompare(b.nextdate);
+    if(a.nextdate) return -1;
+    if(b.nextdate) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  const el = document.getElementById('crmList');
+  if(!filtered.length){
+    el.innerHTML=`<div class="crm-empty"><div class="crm-empty-icon">— Nothing here —</div><p>${crmFilter==='all'?'Add your first client or party above.':'No clients match this filter.'}</p></div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map(c=>crmCardHTML(c)).join('');
+}
+
+function crmCardHTML(c){
+  const typeCls = {party:'ctb-party',broker:'ctb-broker',agent:'ctb-agent',direct:'ctb-direct'}[c.type]||'ctb-party';
+  const typeLabel = {party:'Party',broker:'Broker',agent:'Agent',direct:'Direct'}[c.type]||c.type;
+  const statusCls = {hot:'cc-hot',warm:'cc-warm',cold:'cc-cold',inactive:'cc-inactive'}[c.status]||'cc-warm';
+  const dotCls = {hot:'csd-hot',warm:'csd-warm',cold:'csd-cold',inactive:'csd-inactive'}[c.status]||'csd-warm';
+  const nb = nextBadge(c);
+  const initials = (c.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+  const history = c.history||[];
+  const histHtml = history.length ? history.slice().reverse().map(h=>{
+    const icon = {call:'📞',visit:'🚗',whatsapp:'💬',email:'📧',order:'🧾',sample:'📦',other:'📝'}[h.type]||'📝';
+    const byLine = h.salesman ? ` · ${h.salesman}` : '';
+    return `<div class="chl-item">
+      <div class="chl-icon">${icon}</div>
+      <div class="chl-body">
+        <div class="chl-action">${esc(h.type?.charAt(0).toUpperCase()+h.type?.slice(1)||'Activity')}${byLine?` <span style="color:var(--ink4)">${esc(byLine)}</span>`:''}</div>
+        <div class="chl-meta">${fmtDate(h.date)||fmtDateTime(h.ts)}</div>
+        ${h.note ? `<div class="chl-note">${esc(h.note)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<div style="font-size:0.78rem;color:var(--ink4);padding:4px 0;">No contact history yet.</div>';
+
+  // People from settings for salesman dropdown
+  const salOpts = people.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
+
+  return `<div class="cc ${statusCls}" id="cc-${c.id}">
+    <div class="cc-main">
+      <div class="cc-avatar">${initials}</div>
+      <div class="cc-info">
+        <div class="cc-name">${esc(c.name)}</div>
+        <div class="cc-sub">
+          <span class="cc-type-badge ${typeCls}">${typeLabel}</span>
+          <div class="cc-status-dot ${dotCls}"></div>
+          <span style="font-size:0.7rem;color:var(--ink3)">${esc(c.status?.charAt(0).toUpperCase()+c.status?.slice(1)||'')}</span>
+          ${c.city?`· <span>${esc(c.city)}</span>`:''}
+        </div>
+      </div>
+      <div class="cc-right">
+        <div class="cc-last-contact">Last: ${lastContact(c)}</div>
+        <div class="cc-next-badge ${nb.cls}">${nb.txt}</div>
+      </div>
+    </div>
+    <div class="cc-tags">
+      ${c.salesman?`<span class="cc-tag cct-salesman">👤 ${esc(c.salesman)}</span>`:''}
+      ${c.broker?`<span class="cc-tag cct-city">🤝 ${esc(c.broker)}</span>`:''}
+      ${c.potential?`<span class="cc-tag cct-potential-${c.potential}">${{high:'⬆ High',med:'➡ Med',low:'⬇ Low'}[c.potential]||''} Potential</span>`:''}
+      <span class="cc-tag ${c.sample==='yes'?'cct-sample-yes':'cct-sample-no'}">${c.sample==='yes'?'✓ Sampled':'No Sample'}</span>
+      <span class="cc-tag ${c.ordered==='yes'?'cct-order-yes':'cct-order-no'}">${c.ordered==='yes'?'✓ Ordered':'No Order'}</span>
+      ${c.interests?`<span class="cc-tag cct-city" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${esc(c.interests)}</span>`:''}
+    </div>
+    <div class="cc-quick">
+      <button class="cc-qbtn qb-call"  onclick="crmLogContact('${c.id}','call')">📞 Call</button>
+      <button class="cc-qbtn qb-visit" onclick="crmLogContact('${c.id}','visit')">🚗 Visit</button>
+      <button class="cc-qbtn qb-visit" onclick="crmLogContact('${c.id}','whatsapp')" style="">💬 WA</button>
+      <button class="cc-qbtn qb-edit"  onclick="crmOpenModal('${c.id}')">✎ Edit</button>
+      <button class="cc-qbtn qb-del"   onclick="crmDelete('${c.id}')">✕</button>
+    </div>
+    <button class="cc-remarks-btn" onclick="crmToggleHistory('${c.id}')">
+      <span id="crh-arrow-${c.id}">▸</span> History & Remarks (${history.length})
+    </button>
+    <div class="cc-remarks-panel" id="crh-${c.id}">
+      <div class="cc-history-log" id="chl-${c.id}">${histHtml}</div>
+      <!-- Log new contact form -->
+      <div class="chl-add-form">
+        <div class="chl-add-row">
+          <select class="chl-type-sel" id="chl-type-${c.id}">
+            <option value="call">📞 Call</option>
+            <option value="visit">🚗 Visit</option>
+            <option value="whatsapp">💬 WhatsApp</option>
+            <option value="email">📧 Email</option>
+            <option value="sample">📦 Sample Sent</option>
+            <option value="order">🧾 Order</option>
+            <option value="other">📝 Other</option>
+          </select>
+          <select class="chl-sal-sel" id="chl-sal-${c.id}">
+            <option value="">Salesman (optional)</option>
+            ${salOpts}
+            <option value="__custom">Other…</option>
+          </select>
+          <input class="chl-date-inp" type="date" id="chl-date-${c.id}" value="${todayStr()}"/>
+        </div>
+        <textarea class="chl-note-inp" id="chl-note-${c.id}" rows="2" placeholder="Remarks / what was discussed…"></textarea>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="chl-save-btn" onclick="crmSaveLog('${c.id}')">Log Contact</button>
+          <div style="display:flex;gap:6px;align-items:center;font-size:0.72rem;color:var(--ink3);">
+            Next follow-up:
+            <input class="chl-date-inp" type="date" id="chl-next-${c.id}" style="font-size:0.72rem;padding:4px 7px;" placeholder="Next date"/>
+          </div>
+        </div>
+      </div>
+      ${c.remarks?`<div style="margin-top:8px;font-size:0.78rem;color:var(--ink2);padding:8px 10px;background:var(--cream2);border-radius:8px;line-height:1.5;">${esc(c.remarks)}</div>`:''}
+    </div>
+  </div>`;
+}
+
+// ── HISTORY TOGGLE ──
+function crmToggleHistory(id){
+  const panel = document.getElementById('crh-'+id);
+  const arrow = document.getElementById('crh-arrow-'+id);
+  if(!panel) return;
+  const open = panel.classList.toggle('open');
+  if(arrow) arrow.textContent = open ? '▾' : '▸';
+}
+
+// ── QUICK LOG (from buttons on card) ──
+function crmLogContact(id, type){
+  const c = crmClients.find(x=>x.id===id);
+  if(!c) return;
+  // Open history panel and pre-select type
+  const panel = document.getElementById('crh-'+id);
+  if(panel && !panel.classList.contains('open')) crmToggleHistory(id);
+  const sel = document.getElementById('chl-type-'+id);
+  if(sel) sel.value = type;
+  const noteEl = document.getElementById('chl-note-'+id);
+  if(noteEl) noteEl.focus();
+}
+
+// ── SAVE LOG ENTRY ──
+function crmSaveLog(id){
+  const c = crmClients.find(x=>x.id===id);
+  if(!c) return;
+  const type  = document.getElementById('chl-type-'+id)?.value||'call';
+  const note  = document.getElementById('chl-note-'+id)?.value.trim()||'';
+  const date  = document.getElementById('chl-date-'+id)?.value||todayStr();
+  const next  = document.getElementById('chl-next-'+id)?.value||'';
+  let salesman = document.getElementById('chl-sal-'+id)?.value||'';
+  if(salesman==='__custom') salesman = prompt('Salesman name?')||'';
+  if(!c.history) c.history = [];
+  c.history.push({ id:crmUid(), type, note, date, salesman, ts:Date.now() });
+  if(next) c.nextdate = next;
+  saveCRM();
+  crmRender();
+  // Re-open panel after re-render
+  setTimeout(()=>{ crmToggleHistory(id); },50);
+  toast('Contact logged ✓');
+}
+
+// ── DELETE ──
+function crmDelete(id){
+  const c = crmClients.find(x=>x.id===id);
+  if(!c) return;
+  customConfirm(`Delete <strong>${esc(c.name)}</strong> from your client database?`, ()=>{
+    crmClients = crmClients.filter(x=>x.id!==id);
+    saveCRM(); crmRender(); toast('Client deleted');
+  });
+}
+
+// ── MODAL OPEN ──
+function crmOpenModal(id){
+  crmEditId = id||null;
+  const modal = document.getElementById('crmModal');
+  const overlay = document.getElementById('crmModalOverlay');
+  const title = document.getElementById('crmModalTitle');
+
+  const fields = ['name','contact','phone','city','type','status','salesman','broker','potential','sample','ordered','nextdate','interests','remarks'];
+  const defaults = {type:'party',status:'warm',potential:'med',sample:'no',ordered:'no'};
+
+  if(id){
+    const c = crmClients.find(x=>x.id===id);
+    if(!c) return;
+    title.textContent = 'Edit Client';
+    fields.forEach(f=>{ const el=document.getElementById('cm_'+f); if(el) el.value=c[f]||defaults[f]||''; });
+  } else {
+    title.textContent = 'Add Client';
+    fields.forEach(f=>{ const el=document.getElementById('cm_'+f); if(el) el.value=defaults[f]||''; });
+  }
+  overlay.classList.add('open');
+  document.getElementById('cm_name').focus();
+}
+
+function crmCloseModal(e){
+  if(e && e.target!==document.getElementById('crmModalOverlay')) return;
+  document.getElementById('crmModalOverlay').classList.remove('open');
+  crmEditId = null;
+}
+
+// ── MODAL SAVE ──
+function crmSaveModal(){
+  const name = document.getElementById('cm_name').value.trim();
+  if(!name){ toast('Party name is required'); return; }
+  const fields = ['name','contact','phone','city','type','status','salesman','broker','potential','sample','ordered','nextdate','interests','remarks'];
+  const data = {};
+  fields.forEach(f=>{ data[f] = document.getElementById('cm_'+f)?.value||''; });
+  data.name = name;
+
+  if(crmEditId){
+    const idx = crmClients.findIndex(c=>c.id===crmEditId);
+    if(idx>-1){ crmClients[idx] = {...crmClients[idx], ...data}; }
+  } else {
+    crmClients.unshift({ id:crmUid(), ...data, history:[], createdAt:Date.now() });
+  }
+  saveCRM(); crmRender();
+  document.getElementById('crmModalOverlay').classList.remove('open');
+  crmEditId = null;
+  toast(crmEditId?'Client updated ✓':'Client added ✓');
 }
 
 boot();
