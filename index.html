@@ -11,25 +11,30 @@
 // SUPABASE CONFIG
 // ══════════════════════════════════════
 const SB_URL = 'https://lwaqwxsvgdghekzmanvy.supabase.co';
-const SB_KEY = 'sb_publishable_d4HMHHfzlfcTF0-_ZAIi9w_ffXgnxoV';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3YXF3eHN2Z2RnaGVrem1hbnZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MzI0ODMsImV4cCI6MjA5MTMwODQ4M30.ri3WwF1-bSNHV7LKmkRhjamq3DoZmGDV7L_d1vYyos4';
 
 async function sbFetch(path, opts={}){
-  const { prefer, headers: extraHeaders, ...restOpts } = opts;
-  const r = await fetch(SB_URL+'/rest/v1/'+path, {
+  const { prefer, headers: extraHeaders, body, method='GET', ...restOpts } = opts;
+  const fetchOpts = {
+    method,
     headers:{
       'apikey': SB_KEY,
       'Authorization': 'Bearer '+SB_KEY,
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
       ...(prefer ? {'Prefer': prefer} : {}),
       ...(extraHeaders||{})
     },
+    ...(body ? {body} : {}),
     ...restOpts
-  });
+  };
+  const r = await fetch(SB_URL+'/rest/v1/'+path, fetchOpts);
   if(!r.ok){
     const t = await r.text();
     let msg = t;
-    try { msg = JSON.parse(t).message || t; } catch(e){}
-    toast('Cloud Error: '+msg);
+    try { const j=JSON.parse(t); msg = j.message || j.hint || t; } catch(e){}
+    console.warn('Supabase error:', r.status, msg);
+    toast('Cloud Error: '+msg.slice(0,80));
     throw new Error(msg);
   }
   return r.status===204?null:r.json();
@@ -64,8 +69,17 @@ async function sbDelete(table, id){
 function syncStatus(state){ // 'syncing'|'ok'|'err'
   const el = document.getElementById('syncDot');
   if(!el) return;
-  el.title = state==='ok'?'Synced':state==='syncing'?'Syncing…':'Sync error';
+  el.title = state==='ok'?'Synced ✓':state==='syncing'?'Syncing…':'Sync error — see console';
   el.style.background = state==='ok'?'var(--c-green)':state==='syncing'?'var(--gold2)':'var(--c-red)';
+}
+
+// Warn if running from file:// (CORS will block Supabase)
+function checkOrigin(){
+  if(location.protocol === 'file:'){
+    setTimeout(()=>{
+      toast('⚠ Open from a web server (not file://) for cloud sync');
+    }, 2000);
+  }
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -384,7 +398,8 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .add-meta{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--rule);}
 .mf{display:flex;flex-direction:column;padding:9px 13px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);min-width:0;}
 .mf:nth-child(2n){border-right:none;}
-.mf:nth-last-child(-n+2){border-bottom:none;}
+.mf:nth-last-child(-n+2):not([style*="grid-column"]){border-bottom:none;}
+.mf:last-child{border-bottom:none;border-right:none;}
 .ml{font-size:0.57rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);font-weight:500;margin-bottom:3px;}
 .mf select,.mf input{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--ink);width:100%;}
 .mf input::placeholder{color:var(--ink4);}
@@ -455,6 +470,12 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .tag-asgn{background:var(--cream2);color:var(--ink2);border-color:var(--rule2);font-weight:500;font-size:0.7rem;}
 .tag-asgn::before{content:'→ ';color:var(--ink4);}
 .tag-time{background:var(--bg-blue);color:var(--c-blue);border-color:var(--bd-blue);}
+.tag-due{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
+.tag-due-today{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);font-weight:700;}
+.tag-due-overdue{background:var(--bg-red);color:var(--c-red);border-color:var(--bd-red);font-weight:700;}
+.tag-due-done{background:var(--cream2);color:var(--ink4);border-color:var(--rule);text-decoration:line-through;opacity:.6;}
+[data-theme="dark"] .tag-due{background:var(--cream3);color:var(--ink3);border-color:var(--rule2);}
+[data-theme="dark"] .tag-due-done{background:var(--cream3);}
 .tag-high{background:var(--bg-red);color:var(--c-red);border-color:var(--bd-red);}
 .tag-medium{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);}
 .tag-low{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
@@ -1567,6 +1588,7 @@ function persist(){
 // BOOT — load from Supabase if available
 // ══════════════════════════════════════
 async function boot(){
+  checkOrigin();
   // First render from localStorage immediately (instant)
   load();
   document.getElementById('dateEl').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
@@ -1663,7 +1685,8 @@ function buildAddMeta(){
         <option value="Evening">Evening</option>
         <option value="Before EOD">Before EOD</option>
       </select>
-    </div>`;
+    </div>
+    <div class="mf" style="grid-column:1/-1;border-bottom:none;"><div class="ml">Due Date <span style="font-weight:400;color:var(--ink4)">(optional)</span></div><input id="dueinput" type="date" style="border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);cursor:pointer;width:100%;padding-top:2px;"/></div>`;
 }
 
 function buildQuickChips(){
@@ -1843,6 +1866,19 @@ function taskHTML(t){
   const timeTag=t.time?`<span class="tag tag-time">⏱ ${esc(t.time)}</span>`:'';
   const asgnTag=t.assignee?`<span class="tag tag-asgn">${esc(t.assignee)}</span>`:'';
 
+  // Due date tag — red if overdue, amber if today, normal otherwise
+  let dueDateTag = '';
+  if(t.dueDate && !t.done){
+    const today = new Date().toISOString().slice(0,10);
+    const isOverdue = t.dueDate < today;
+    const isToday = t.dueDate === today;
+    const label = isToday ? '📅 Today' : '📅 ' + new Date(t.dueDate+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const cls = isOverdue ? 'tag-due-overdue' : isToday ? 'tag-due-today' : 'tag-due';
+    dueDateTag = `<span class="tag ${cls}">${label}</span>`;
+  } else if(t.dueDate && t.done){
+    dueDateTag = `<span class="tag tag-due-done">📅 ${new Date(t.dueDate+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>`;
+  }
+
   // Build edit panel selects
   const deptOpts = depts.map(d=>`<option value="${d.id}"${d.id===t.dept?' selected':''}>${d.label}</option>`).join('');
   const peopleOpts = ['<option value="">— None —</option>','<option value="Self"'+(t.assignee==='Self'?' selected':'')+'>Self</option>',
@@ -1861,6 +1897,7 @@ function taskHTML(t){
             <span class="tag" style="${ds}">${dl}</span>
             <span class="tag tag-${t.priority}">${pl}</span>
             ${timeTag}
+            ${dueDateTag}
           </div>
         </div>
         <div class="tc-actions">
@@ -1902,6 +1939,10 @@ function taskHTML(t){
             <option value="Before EOD"${t.time==='Before EOD'?' selected':''}>Before EOD</option>
           </select>
         </div>
+        <div class="tep-field">
+          <div class="tep-lbl">Due Date</div>
+          <input class="tep-input" id="tep-due-${t.id}" type="date" value="${esc(t.dueDate||'')}"/>
+        </div>
         <div class="tep-field full">
           <div class="tep-lbl">Note</div>
           <input class="tep-input" id="tep-note-${t.id}" type="text" value="${esc(t.note||'')}" placeholder="Context, reminders…"/>
@@ -1928,9 +1969,11 @@ function addTask(){
     assignee:document.getElementById('ainput')?.value||'',
     priority:document.getElementById('pinput')?.value||'medium',
     time:document.getElementById('tinput')?.value||'',
+    dueDate:document.getElementById('dueinput')?.value||'',
     note:'',done:false,ts:Date.now()
   });
   document.getElementById('taskInput').value='';
+  if(document.getElementById('dueinput')) document.getElementById('dueinput').value='';
   document.getElementById('taskInput').focus();
   render(); toast('Task added ✓');
 }
@@ -1997,6 +2040,7 @@ function saveTaskEdit(id){
   t.dept     = document.getElementById('tep-dept-'+id)?.value||t.dept;
   t.priority = document.getElementById('tep-prio-'+id)?.value||t.priority;
   t.time     = document.getElementById('tep-time-'+id)?.value||'';
+  t.dueDate  = document.getElementById('tep-due-'+id)?.value||'';
   t.note     = document.getElementById('tep-note-'+id)?.value.trim()||'';
   render(); toast('Task updated ✓');
 }
