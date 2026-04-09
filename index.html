@@ -42,7 +42,7 @@ async function sbFetch(path, opts={}){
 
 // Upsert a single row: table has (id text PK, data jsonb)
 async function sbUpsert(table, id, data){
-  return sbFetch(table, {
+  return sbFetch(table+'?on_conflict=id', {
     method:'POST',
     prefer:'resolution=merge-duplicates,return=minimal',
     body: JSON.stringify({id, data, updated_at: new Date().toISOString()})
@@ -1601,6 +1601,24 @@ async function boot(){
   try {
     syncStatus('syncing');
 
+    // Quick connection test first
+    const testResp = await fetch(SB_URL+'/rest/v1/nk_tasks?select=id&limit=1', {
+      headers:{
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer '+SB_KEY,
+        'Accept': 'application/json'
+      }
+    });
+    if(!testResp.ok){
+      const errText = await testResp.text();
+      console.error('Supabase connection test failed:', testResp.status, errText);
+      toast('Cloud error '+testResp.status+': '+errText.slice(0,60));
+      syncStatus('err');
+      await loadCRM();
+      crmRender();
+      return;
+    }
+
     // Load settings (depts, people, templates, tasks_meta)
     const settingsMeta = await sbGet('nk_settings','tasks_meta');
     if(settingsMeta){
@@ -1628,8 +1646,10 @@ async function boot(){
     render();
     renderNotes();
     syncStatus('ok');
+    toast('☁ Cloud sync connected ✓');
   } catch(e){
-    console.warn('Supabase boot hydration failed, using local data', e);
+    console.error('Supabase boot failed:', e.message, e);
+    toast('Cloud sync failed: '+e.message.slice(0,60));
     syncStatus('err');
   }
 
