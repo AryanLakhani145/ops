@@ -394,16 +394,17 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .add-btn{flex-shrink:0;padding:8px 18px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;letter-spacing:0.03em;cursor:pointer;transition:background .15s;}
 .add-btn:active{background:var(--ink2);}
 
-/* Meta grid - 2x2 on mobile */
+/* Meta grid - 2x2 + due date row */
 .add-meta{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--rule);}
 .mf{display:flex;flex-direction:column;padding:9px 13px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);min-width:0;}
 .mf:nth-child(2n){border-right:none;}
-.mf:nth-last-child(-n+2):not([style*="grid-column"]){border-bottom:none;}
 .mf:last-child{border-bottom:none;border-right:none;}
+.mf-due{grid-column:1/-1;border-right:none;border-bottom:none;}
 .ml{font-size:0.57rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);font-weight:500;margin-bottom:3px;}
-.mf select,.mf input{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--ink);width:100%;}
+.mf select,.mf input[type="text"],.mf input[type="date"]{border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--ink);width:100%;}
 .mf input::placeholder{color:var(--ink4);}
 .mf select option{background:#fff;color:var(--ink);}
+[data-theme="dark"] .mf select option{background:#211F19;color:var(--ink);}
 
 /* Quick chips */
 .qrow{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:2px 0;}
@@ -1706,7 +1707,12 @@ function buildAddMeta(){
         <option value="Before EOD">Before EOD</option>
       </select>
     </div>
-    <div class="mf" style="grid-column:1/-1;border-bottom:none;"><div class="ml">Due Date <span style="font-weight:400;color:var(--ink4)">(optional)</span></div><input id="dueinput" type="date" style="border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);cursor:pointer;width:100%;padding-top:2px;"/></div>`;
+    <div class="mf mf-due"><div class="ml">Due Date <span style="font-weight:400;color:var(--ink4);text-transform:none;letter-spacing:0">(optional)</span></div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input id="dueinput" type="date" style="border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--ink);cursor:pointer;flex:1;min-width:0;"/>
+        <button onclick="document.getElementById('dueinput').value=''" title="Clear date" style="border:none;background:none;color:var(--ink4);font-size:0.8rem;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;" onmouseover="this.style.color='var(--c-red)'" onmouseout="this.style.color='var(--ink4)'">✕</button>
+      </div>
+    </div>`;
 }
 
 function buildQuickChips(){
