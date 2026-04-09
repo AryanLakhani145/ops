@@ -1303,11 +1303,10 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabase = window.supabase.createClient(
+const _supabase = supabase.createClient(
   'https://lwaqwxsvgdghekzmanvy.supabase.co',
   'sb_publishable_d4HMHHfzlfcTF0-_ZAIi9w_ffXgnxoV'
 );
-
 // ══════════════════════════════════════
 // CONSTANTS & PALETTE
 // ══════════════════════════════════════
@@ -1380,74 +1379,24 @@ const DEFAULT_TPLS=[
 // ══════════════════════════════════════
 // LOAD / SAVE
 // ══════════════════════════════════════
-async function load(){
-  try {
-    const { data, error } = await supabase
-      .from('app_state')
-      .select('data')
-      .eq('id', 'main')
-      .single();
-
-    if (error) {
-      console.error('Supabase load error:', error);
-
-      // fallback so app still works
-      tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-      depts = JSON.parse(JSON.stringify(DEFAULT_DEPTS));
-      people = JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
-      templates = JSON.parse(JSON.stringify(DEFAULT_TPLS));
-      notes = [];
-      crmClients = [];
-      return;
-    }
-
-    const saved = data?.data || {};
-
-    tasks = saved.tasks || JSON.parse(JSON.stringify(DEFAULT_TASKS));
-    depts = saved.depts || JSON.parse(JSON.stringify(DEFAULT_DEPTS));
-    people = saved.people || JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
-    templates = saved.templates || JSON.parse(JSON.stringify(DEFAULT_TPLS));
-    notes = saved.notes || [];
-    crmClients = saved.crmClients || [];
-  } catch(err){
-    console.error(err);
-
-    tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-    depts = JSON.parse(JSON.stringify(DEFAULT_DEPTS));
-    people = JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
-    templates = JSON.parse(JSON.stringify(DEFAULT_TPLS));
-    notes = [];
-    crmClients = [];
-  }
+function load(){
+  tasks     = JSON.parse(localStorage.getItem(K.tasks)  || 'null') || JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  depts     = JSON.parse(localStorage.getItem(K.depts)  || 'null') || JSON.parse(JSON.stringify(DEFAULT_DEPTS));
+  people    = JSON.parse(localStorage.getItem(K.people) || 'null') || JSON.parse(JSON.stringify(DEFAULT_PEOPLE));
+  templates = JSON.parse(localStorage.getItem(K.tpls)   || 'null') || JSON.parse(JSON.stringify(DEFAULT_TPLS));
 }
-
-async function persist(){
-  try {
-    const { error } = await supabase
-      .from('app_state')
-      .upsert({
-        id: 'main',
-        data: {
-          tasks,
-          depts,
-          people,
-          templates,
-          notes,
-          crmClients
-        }
-      });
-
-    if (error) console.error('Supabase save error:', error);
-  } catch(err){
-    console.error(err);
-  }
+function persist(){
+  localStorage.setItem(K.tasks, JSON.stringify(tasks));
+  localStorage.setItem(K.depts, JSON.stringify(depts));
+  localStorage.setItem(K.people,JSON.stringify(people));
+  localStorage.setItem(K.tpls,  JSON.stringify(templates));
 }
 
 // ══════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════
-async function boot(){
-  await load();
+function boot(){
+  load();
   document.getElementById('dateEl').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
   rebuildAll();
   render();
@@ -2384,6 +2333,15 @@ function applyTheme(){
 // ══════════════════════════════════════
 const CRM_KEY = 'nk_crm_v1';
 let crmClients = [];
+
+async function loadCloudData() {
+  const { data: clients } = await _supabase.from('clients').select('*');
+  if (clients) {
+    crmClients = clients;
+    renderCrmTable();
+  }
+}
+loadCloudData();
 let crmFilter  = 'all';
 let crmEditId  = null;
 
@@ -2677,7 +2635,8 @@ function crmCloseModal(e){
 }
 
 // ── MODAL SAVE ──
-function crmSaveModal(){
+
+async function crmSaveModal(){
   const name = document.getElementById('cm_name').value.trim();
   if(!name){ toast('Party name is required'); return; }
   const fields = ['name','contact','phone','city','type','status','salesman','broker','potential','sample','ordered','nextdate','interests','remarks'];
@@ -2685,6 +2644,19 @@ function crmSaveModal(){
   fields.forEach(f=>{ data[f] = document.getElementById('cm_'+f)?.value||''; });
   data.name = name;
 
+  // Cloud Save
+  const { error } = await _supabase.from('clients').upsert([data], { onConflict: 'name' });
+
+  if(error) {
+    toast('Cloud Error: ' + error.message);
+  } else {
+    toast('Saved to Cloud');
+    crmCloseModal();
+    loadCloudData();
+  }
+}
+
+function originalCrmSaveModal_Old(){
   if(crmEditId){
     const idx = crmClients.findIndex(c=>c.id===crmEditId);
     if(idx>-1){ crmClients[idx] = {...crmClients[idx], ...data}; }
