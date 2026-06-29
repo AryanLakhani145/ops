@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F8F4ED">
 <title>Daily Ops · Nakshatra</title>
 <script>
 // ══════════════════════════════════════
@@ -111,20 +112,20 @@ function syncStatus(state){ // 'syncing'|'ok'|'err'
 
 /* ── DARK MODE VARIABLES — warm charcoal palette ── */
 [data-theme="dark"]{
-  --cream:   #101418;
-  --cream2:  #171C21;
-  --cream3:  #20272E;
-  --white:   #1B2026;
-  --ink:     #F4EFE6;
-  --ink2:    #D8D0C4;
-  --ink3:    #A79D90;
-  --ink4:    #766F67;
-  --rule:    #2B333B;
-  --rule2:   #3A4650;
-  --gold:    #E7BC55;
-  --gold2:   #D99D36;
-  --gold-lt: #2B2414;
-  --gold-bd: #A97924;
+  --cream:   #14110C;
+  --cream2:  #1C1812;
+  --cream3:  #26201A;
+  --white:   #201B14;
+  --ink:     #F3EDE1;
+  --ink2:    #D8CFC0;
+  --ink3:    #A79C8B;
+  --ink4:    #79705F;
+  --rule:    #2E2820;
+  --rule2:   #41392E;
+  --gold:    #ECC25C;
+  --gold2:   #DDA53E;
+  --gold-lt: #2A2210;
+  --gold-bd: #9E7A2C;
   --c-red:#F08080;    --bg-red:#1E0E0E;    --bd-red:#6A2C2C;
   --c-amber:#E0B84A;  --bg-amber:#1E1608;  --bd-amber:#6A5010;
   --c-green:#6ED48A;  --bg-green:#0C1E12;  --bd-green:#226030;
@@ -930,6 +931,90 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
   .notes-list-wrap{padding:12px 22px 120px;}
 }
 
+/* ══════════════════════════════
+   MOBILE NAV — hamburger + drawer
+══════════════════════════════ */
+.hdr-lead{display:flex;align-items:center;gap:11px;min-width:0;}
+.hamburger{
+  display:none;flex-direction:column;justify-content:center;gap:4.5px;
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  border:1.5px solid var(--rule2);background:var(--white);
+  cursor:pointer;transition:all .18s;padding:0 9px;
+}
+.hamburger span{display:block;height:2px;width:100%;border-radius:2px;background:var(--ink2);transition:all .25s;}
+.hamburger:hover{border-color:var(--gold-bd);background:var(--gold-lt);}
+.hamburger:active{transform:scale(.94);}
+body.drawer-open .hamburger span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+body.drawer-open .hamburger span:nth-child(2){opacity:0;}
+body.drawer-open .hamburger span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+
+.nav-backdrop{
+  position:fixed;inset:0;z-index:110;
+  background:rgba(20,15,10,0.5);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  opacity:0;pointer-events:none;transition:opacity .28s ease;
+}
+.nav-backdrop.open{opacity:1;pointer-events:auto;}
+
+.nav-drawer{
+  position:fixed;top:0;left:0;bottom:0;z-index:120;
+  width:284px;max-width:84vw;
+  background:var(--white);border-right:1.5px solid var(--rule);
+  box-shadow:6px 0 32px rgba(0,0,0,0.16);
+  display:flex;flex-direction:column;
+  transform:translateX(-104%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  padding-top:env(safe-area-inset-top);
+  overflow-y:auto;overscroll-behavior:contain;
+}
+.nav-drawer.open{transform:none;}
+.nd-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:20px 18px 14px;border-bottom:1.5px solid var(--rule);}
+.nd-brand{font-family:'Lora',serif;font-size:1.12rem;font-weight:600;color:var(--ink);line-height:1.2;}
+.nd-brand i{font-style:italic;font-weight:400;color:var(--gold2);}
+.nd-user{font-size:0.66rem;color:var(--ink4);letter-spacing:.04em;margin-top:4px;}
+.nd-close{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--rule2);background:var(--cream2);color:var(--ink3);font-size:0.95rem;cursor:pointer;flex-shrink:0;transition:all .15s;}
+.nd-close:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
+.nd-nav{display:flex;flex-direction:column;gap:3px;padding:12px 12px 6px;}
+.nd-item{
+  display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+  padding:12px 13px;border-radius:11px;border:1.5px solid transparent;
+  background:none;cursor:pointer;color:var(--ink2);
+  font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:500;transition:all .15s;
+}
+.nd-item .nd-ic{font-size:1.12rem;width:22px;text-align:center;flex-shrink:0;}
+.nd-item:hover{background:var(--cream2);color:var(--ink);}
+.nd-item:active{transform:scale(.985);}
+.nd-item.nd-active{background:var(--gold-lt);color:var(--gold);border-color:var(--gold-bd);font-weight:600;}
+.nd-sep{height:1px;background:var(--rule);margin:8px 16px;}
+.nd-filters{padding:2px 12px 12px;display:flex;flex-direction:column;gap:2px;}
+.nd-filters .sb-title{padding:12px 6px 5px;}
+.nd-foot{margin-top:auto;display:flex;gap:9px;padding:14px 14px calc(16px + env(safe-area-inset-bottom));border-top:1.5px solid var(--rule);}
+.nd-foot-btn{flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--rule2);background:var(--cream2);color:var(--ink2);font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all .15s;}
+.nd-foot-btn:hover{background:var(--cream3);border-color:var(--rule);}
+.nd-signout{flex:0 0 auto;}
+.nd-signout:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
+
+/* Sliding tabs — let the top tab bar scroll horizontally on phones */
+@media(max-width:899px){
+  .hamburger{display:flex;}
+  .hdr{padding:13px 16px 0;}
+  .tab-nav{
+    overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;gap:2px;
+    margin:0 -16px;padding:0 10px;
+  }
+  .tab-nav::-webkit-scrollbar{display:none;}
+  .tab-btn{flex:0 0 auto;padding:12px 14px;scroll-snap-align:center;font-size:0.82rem;}
+  .tab-icon{font-size:1rem;}
+  /* dark-mode toggle + sign-out live in the drawer on mobile */
+  .hdr-right .dm-toggle,.hdr-right .staff-banner-logout{display:none;}
+  .brand{font-size:1.04rem;}
+  .hdr-sub{font-size:0.56rem;}
+  .pct-num{font-size:1.2rem;}
+}
+@media(min-width:900px){
+  .hamburger{display:none!important;}
+  .nav-drawer,.nav-backdrop{display:none!important;}
+}
+
 /* ══ LOGIN SCREEN ══ */
 .login-screen{
   position:fixed;inset:0;z-index:1000;
@@ -1269,9 +1354,14 @@ body.is-staff .staff-lock-assignee{opacity:.55;pointer-events:none;}
 <!-- ═══════ HEADER ═══════ -->
 <header class="hdr">
   <div class="hdr-top">
-    <div>
-      <div class="brand">Nakshatra <i>Creations</i></div>
-      <div class="hdr-sub" id="dateEl"></div>
+    <div class="hdr-lead">
+      <button class="hamburger" id="hamburgerBtn" onclick="openDrawer()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div style="min-width:0;">
+        <div class="brand">Nakshatra <i>Creations</i></div>
+        <div class="hdr-sub" id="dateEl"></div>
+      </div>
     </div>
     <div class="hdr-right" id="hdrRight">
       <div style="display:flex;align-items:center;gap:8px;">
@@ -1310,6 +1400,25 @@ body.is-staff .staff-lock-assignee{opacity:.55;pointer-events:none;}
     </button>
   </div>
 </header>
+
+<!-- ═══════ MOBILE NAV DRAWER ═══════ -->
+<div class="nav-backdrop" id="navBackdrop" onclick="closeDrawer()"></div>
+<aside class="nav-drawer" id="navDrawer" aria-hidden="true">
+  <div class="nd-head">
+    <div>
+      <div class="nd-brand">Nakshatra <i>Creations</i></div>
+      <div class="nd-user" id="ndUser"></div>
+    </div>
+    <button class="nd-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
+  </div>
+  <nav class="nd-nav" id="ndNav"></nav>
+  <div class="nd-sep"></div>
+  <div class="nd-filters" id="ndFilters"></div>
+  <div class="nd-foot">
+    <button class="nd-foot-btn" id="ndTheme" onclick="toggleDarkMode()"></button>
+    <button class="nd-foot-btn nd-signout" onclick="doLogout()">Sign Out</button>
+  </div>
+</aside>
 
 <!-- STATS BAR (today only) -->
 <div class="stats-bar" id="statsBar">
@@ -2925,7 +3034,76 @@ function switchTab(tab){
   if(tab==='crm') crmRender();
   if(tab==='payments') payRender();
   if(tab==='admin') adminRender();
+  // Keep the active tab visible in the horizontally-scrolling mobile tab bar
+  const activeBtn = document.querySelector('.tab-btn.active');
+  if(activeBtn && activeBtn.scrollIntoView){
+    activeBtn.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+  }
+  buildDrawer();
 }
+
+// ══════════════════════════════════════
+// MOBILE NAV DRAWER
+// ══════════════════════════════════════
+const NAV_ITEMS = [
+  {tab:'today',     ic:'📋', label:'Today'},
+  {tab:'checklist', ic:'✅', label:'Parties'},
+  {tab:'notes',     ic:'💡', label:'Notes'},
+  {tab:'crm',       ic:'🤝', label:'Clients'},
+  {tab:'payments',  ic:'💰', label:'Payments'},
+  {tab:'admin',     ic:'🛡', label:'Admin',    admin:true},
+  {tab:'settings',  ic:'⚙',  label:'Settings', admin:true},
+];
+
+function buildDrawer(){
+  const nav = document.getElementById('ndNav');
+  if(nav){
+    nav.innerHTML = NAV_ITEMS
+      .filter(it=>!it.admin || (typeof isAdmin==='function' && isAdmin()))
+      .map(it=>`<button class="nd-item ${currentTab===it.tab?'nd-active':''}" onclick="navTo('${it.tab}')">
+        <span class="nd-ic">${it.ic}</span><span>${it.label}</span></button>`).join('');
+  }
+  const f = document.getElementById('ndFilters');
+  const onToday = currentTab==='today';
+  const sep = document.querySelector('.nd-sep');
+  if(sep) sep.style.display = onToday ? 'block' : 'none';
+  if(f){
+    f.style.display = onToday ? 'flex' : 'none';
+    if(onToday){
+      const prioColor = {high:'var(--c-red)',medium:'var(--gold2)',low:'var(--c-green)'};
+      f.innerHTML =
+        `<div class="sb-title">Department</div>`
+        + `<button class="sb-btn ${filt.dept==='all'?'sa':''}" data-dept="all" onclick="fDept(this,'all')"><span class="sbl"><span class="sbd" style="background:var(--ink4)"></span>All Tasks</span></button>`
+        + depts.map(d=>`<button class="sb-btn ${filt.dept===d.id?'sa':''}" data-dept="${d.id}" onclick="fDept(this,'${d.id}')"><span class="sbl"><span class="sbd" style="background:${deptColor(d.color)}"></span>${esc(d.label)}</span></button>`).join('')
+        + `<div class="sb-title">Priority</div>`
+        + ['high','medium','low'].map(p=>`<button class="sb-btn ${filt.prio===p?'sa':''}" data-prio="${p}" onclick="fPrio(this,'${p}')"><span class="sbl"><span class="sbd" style="background:${prioColor[p]}"></span>${p.charAt(0).toUpperCase()+p.slice(1)}</span></button>`).join('')
+        + `<div class="sb-title">View</div>`
+        + [['pending','Pending only','var(--c-amber)'],['done','Completed','var(--c-green)'],['all','Show all','var(--ink4)']]
+            .map(v=>`<button class="sb-btn ${filt.status===v[0]?'sa':''}" data-status="${v[0]}" onclick="fStatus(this,'${v[0]}')"><span class="sbl"><span class="sbd" style="background:${v[2]}"></span>${v[1]}</span></button>`).join('');
+    }
+  }
+  const u = document.getElementById('ndUser');
+  if(u) u.textContent = currentUser ? (currentUser.role==='admin' ? 'Signed in as Admin' : 'Signed in as '+currentUser.name) : '';
+  const t = document.getElementById('ndTheme');
+  if(t) t.textContent = (typeof isDark!=='undefined' && isDark) ? '☀️ Light mode' : '🌙 Dark mode';
+}
+
+function navTo(tab){ switchTab(tab); closeDrawer(); }
+
+function openDrawer(){
+  buildDrawer();
+  document.getElementById('navDrawer').classList.add('open');
+  document.getElementById('navBackdrop').classList.add('open');
+  document.getElementById('navDrawer').setAttribute('aria-hidden','false');
+  document.body.classList.add('drawer-open');
+}
+function closeDrawer(){
+  document.getElementById('navDrawer').classList.remove('open');
+  document.getElementById('navBackdrop').classList.remove('open');
+  document.getElementById('navDrawer').setAttribute('aria-hidden','true');
+  document.body.classList.remove('drawer-open');
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeDrawer(); });
 
 function adminRender(){
   const el=document.getElementById('adminApprovals');
@@ -3208,6 +3386,10 @@ function toggleDarkMode(){
 function applyTheme(){
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
   document.getElementById('dmToggle').textContent = isDark ? '☀️' : '🌙';
+  const t = document.getElementById('ndTheme');
+  if(t) t.textContent = isDark ? '☀️ Light mode' : '🌙 Dark mode';
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', isDark ? '#101418' : '#F8F4ED');
 }
 
 // ══════════════════════════════════════
@@ -3912,26 +4094,35 @@ function hashPass(p){ var h=0; for(var i=0;i<p.length;i++){h=Math.imul(31,h)+p.c
 
 function getPasses(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'{}'); }catch(e){return{};} }
 
+// Saves locally immediately, then pushes to the cloud. Returns a promise that
+// resolves true if the cloud write succeeded, false otherwise — callers can
+// surface an honest "synced / saved locally only" message.
 function savePasses(obj){
   localStorage.setItem(AUTH_KEY, JSON.stringify(obj));
-  // Sync to Supabase so all devices share the same passwords
-  sbUpsert('nk_settings', 'auth_passes', obj).catch(function(e){
-    console.warn('Password sync failed:', e);
-  });
+  if(location.protocol === 'file:'){
+    // Opened as a local file — Supabase is unreachable, so devices can't share.
+    return Promise.resolve(false);
+  }
+  return sbUpsert('nk_settings', 'auth_passes', obj)
+    .then(function(){ return true; })
+    .catch(function(e){ console.warn('Password sync failed:', e); return false; });
 }
 
 async function loadPassesFromCloud(){
   try {
-    var row = await sbGet('nk_settings', 'auth_passes');
-    if(row && row.data){
-      // Merge cloud into local (cloud wins)
+    // sbGet already returns row.data (or null), not the whole row.
+    var data = await sbGet('nk_settings', 'auth_passes');
+    if(data && typeof data === 'object'){
+      // Merge cloud into local (cloud wins) so every device shares one set.
       var local = getPasses();
-      var merged = Object.assign({}, local, row.data);
+      var merged = Object.assign({}, local, data);
       localStorage.setItem(AUTH_KEY, JSON.stringify(merged));
+      return true;
     }
   } catch(e){
     console.warn('Could not load passwords from cloud, using local:', e);
   }
+  return false;
 }
 
 function buildLoginSelects(){
@@ -3958,16 +4149,31 @@ function showSetPassword(){
   buildLoginSelects();
 }
 
-function doLogin(){
+async function doLogin(){
   var idVal = document.getElementById('loginName').value;
   var pass  = document.getElementById('loginPass').value;
   var err   = document.getElementById('loginErr');
+  err.style.color='';
   if(!idVal){ err.textContent='Please select your name.'; return; }
   if(!pass)  { err.textContent='Please enter your password.'; return; }
 
   var passes = getPasses();
   var stored = passes[idVal];
-  if(!stored){ err.textContent='No password set yet. Set one first.'; return; }
+  // Not found locally? Pull the latest from the cloud before giving up — covers
+  // the case where the password was set on another device after this one booted.
+  if(!stored && location.protocol !== 'file:'){
+    err.style.color=''; err.textContent='Checking…';
+    await loadPassesFromCloud();
+    passes = getPasses();
+    stored = passes[idVal];
+    err.textContent='';
+  }
+  if(!stored){
+    err.textContent = location.protocol === 'file:'
+      ? 'No password set on this device. (Open the hosted link, not the file, to share passwords across devices.)'
+      : 'No password set yet. Tap “Set up your password” below.';
+    return;
+  }
   if(stored !== hashPass(pass)){ err.textContent='Incorrect password.'; return; }
 
   // Determine role
@@ -3978,25 +4184,35 @@ function doLogin(){
   enterApp();
 }
 
-function doSetPassword(){
+async function doSetPassword(){
   var idVal = document.getElementById('spName').value;
   var p1    = document.getElementById('spPass1').value;
   var p2    = document.getElementById('spPass2').value;
   var err   = document.getElementById('spErr');
+  err.style.color='';
   if(!idVal){ err.textContent='Select your name.'; return; }
   if(!p1||p1.length<4){ err.textContent='Password must be at least 4 characters.'; return; }
   if(p1!==p2){ err.textContent='Passwords do not match.'; return; }
 
+  // Pull the freshest passwords first so we don't clobber a password another
+  // device just set, and so the "already set" guard below is accurate.
+  if(location.protocol !== 'file:'){
+    err.textContent='Saving…';
+    await loadPassesFromCloud();
+    err.textContent='';
+  }
   var passes = getPasses();
   // Only admin can set admin password; staff can only set their own if not already set OR if admin
   if(idVal==='__admin__' && passes['__admin__'] && !(currentUser&&currentUser.role==='admin')){
     err.textContent='Admin password already set. Contact admin to reset.'; return;
   }
   passes[idVal] = hashPass(p1);
-  savePasses(passes);
+  var synced = await savePasses(passes);
   err.style.color='var(--c-green)';
-  err.textContent='Password saved! You can now sign in.';
-  setTimeout(function(){ err.style.color=''; showLogin(); }, 1500);
+  err.textContent = synced
+    ? 'Password saved & synced! You can now sign in on any device.'
+    : 'Saved on this device. (Not synced — open the hosted link to share across devices.)';
+  setTimeout(function(){ err.style.color=''; showLogin(); }, 1800);
 }
 
 function doLogout(){
