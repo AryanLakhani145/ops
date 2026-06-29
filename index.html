@@ -14,6 +14,8 @@ const SB_URL = 'https://lwaqwxsvgdghekzmanvy.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3YXF3eHN2Z2RnaGVrem1hbnZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MzI0ODMsImV4cCI6MjA5MTMwODQ4M30.ri3WwF1-bSNHV7LKmkRhjamq3DoZmGDV7L_d1vYyos4';
 
 async function sbFetch(path, opts={}){
+  // Skip entirely when running from file:// — CORS will block it anyway
+  if(location.protocol === 'file:') return null;
   const { prefer, headers: extraHeaders, body, method='GET', ...restOpts } = opts;
   const fetchOpts = {
     method,
@@ -69,17 +71,8 @@ async function sbDelete(table, id){
 function syncStatus(state){ // 'syncing'|'ok'|'err'
   const el = document.getElementById('syncDot');
   if(!el) return;
-  el.title = state==='ok'?'Synced ✓':state==='syncing'?'Syncing…':'Sync error — see console';
-  el.style.background = state==='ok'?'var(--c-green)':state==='syncing'?'var(--gold2)':'var(--c-red)';
-}
-
-// Warn if running from file:// (CORS will block Supabase)
-function checkOrigin(){
-  if(location.protocol === 'file:'){
-    setTimeout(()=>{
-      toast('⚠ Open from a web server (not file://) for cloud sync');
-    }, 2000);
-  }
+  el.title = state==='ok'?'Synced ✓':state==='syncing'?'Syncing…':'Offline — data saved locally';
+  el.style.background = state==='ok'?'var(--c-green)':state==='syncing'?'var(--gold2)':'var(--ink4)';
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -116,33 +109,33 @@ function checkOrigin(){
   --sh2:0 4px 20px rgba(0,0,0,0.10),0 2px 6px rgba(0,0,0,0.06);
 }
 
-/* ── DARK MODE VARIABLES ── */
+/* ── DARK MODE VARIABLES — warm charcoal palette ── */
 [data-theme="dark"]{
-  --cream:   #12100C;
-  --cream2:  #1C1A15;
-  --cream3:  #262319;
-  --white:   #211F19;
-  --ink:     #EDE6D8;
-  --ink2:    #C8C0B0;
-  --ink3:    #857D72;
-  --ink4:    #524D47;
-  --rule:    #2E2B22;
-  --rule2:   #3A362C;
-  --gold:    #D4A832;
-  --gold2:   #C8920E;
-  --gold-lt: #221A06;
-  --gold-bd: #7A5C0C;
-  --c-red:#E07878;    --bg-red:#1A0C0C;    --bd-red:#5A2424;
-  --c-amber:#D4A832;  --bg-amber:#1A1206;  --bd-amber:#5A420C;
-  --c-green:#5EC47A;  --bg-green:#0A1810;  --bd-green:#1C5228;
-  --c-blue:#6AAEE8;   --bg-blue:#0A101E;   --bd-blue:#183462;
-  --c-purple:#A87AE0; --bg-purple:#120A20; --bd-purple:#38186A;
-  --c-teal:#4AC4B0;   --bg-teal:#061412;   --bd-teal:#0A423A;
-  --c-orange:#D4956A; --bg-orange:#180E08; --bd-orange:#522C16;
-  --c-rose:#E07AA8;   --bg-rose:#180A10;   --bd-rose:#601830;
-  --c-slate:#8AAAC8;  --bg-slate:#0A0E16;  --bd-slate:#1C2C48;
-  --sh:0 1px 4px rgba(0,0,0,0.4),0 2px 10px rgba(0,0,0,0.3);
-  --sh2:0 4px 20px rgba(0,0,0,0.5),0 2px 6px rgba(0,0,0,0.4);
+  --cream:   #101418;
+  --cream2:  #171C21;
+  --cream3:  #20272E;
+  --white:   #1B2026;
+  --ink:     #F4EFE6;
+  --ink2:    #D8D0C4;
+  --ink3:    #A79D90;
+  --ink4:    #766F67;
+  --rule:    #2B333B;
+  --rule2:   #3A4650;
+  --gold:    #E7BC55;
+  --gold2:   #D99D36;
+  --gold-lt: #2B2414;
+  --gold-bd: #A97924;
+  --c-red:#F08080;    --bg-red:#1E0E0E;    --bd-red:#6A2C2C;
+  --c-amber:#E0B84A;  --bg-amber:#1E1608;  --bd-amber:#6A5010;
+  --c-green:#6ED48A;  --bg-green:#0C1E12;  --bd-green:#226030;
+  --c-blue:#78B8F0;   --bg-blue:#0C1422;   --bd-blue:#1E3E70;
+  --c-purple:#BC8AE8; --bg-purple:#160C24; --bd-purple:#421E78;
+  --c-teal:#56CEC0;   --bg-teal:#081816;   --bd-teal:#0C4C44;
+  --c-orange:#E0A478; --bg-orange:#1C100A; --bd-orange:#60341A;
+  --c-rose:#F08AB8;   --bg-rose:#1C0C14;   --bd-rose:#6E1E3A;
+  --c-slate:#9ABCE0;  --bg-slate:#0C1018;  --bd-slate:#22345A;
+  --sh:0 1px 4px rgba(0,0,0,0.32),0 2px 10px rgba(0,0,0,0.26);
+  --sh2:0 8px 28px rgba(0,0,0,0.42),0 2px 8px rgba(0,0,0,0.28);
 }
 
 /* Smooth theme transition on key surfaces */
@@ -188,15 +181,15 @@ body,
 [data-theme="dark"] .note-save-btn,
 [data-theme="dark"] .ss-add,
 [data-theme="dark"] .confirm-yes{
-  background:#2C2820;
-  color:#EDE6D8;
-  border:1.5px solid #4A4438;
+  background:var(--gold-lt);
+  color:var(--gold);
+  border:1.5px solid var(--gold-bd);
 }
 [data-theme="dark"] .add-btn:hover,
 [data-theme="dark"] .notes-capture-btn:hover,
 [data-theme="dark"] .ep-save:hover,
 [data-theme="dark"] .note-save-btn:hover,
-[data-theme="dark"] .ss-add:hover{background:#3A3528;border-color:#5A5040;}
+[data-theme="dark"] .ss-add:hover{background:#352808;border-color:#A07820;}
 
 /* Carry forward — gold accent in dark */
 [data-theme="dark"] .bb-carry{
@@ -208,13 +201,13 @@ body,
 
 /* Active sidebar buttons */
 [data-theme="dark"] .sb-btn.sa{
-  background:#2A2820;color:var(--ink);border-color:var(--rule2);
+  background:var(--gold-lt);color:var(--gold);border-color:var(--gold-bd);
 }
 
 /* Chip active state */
 [data-theme="dark"] .ncat-chip.ncat-active,
 [data-theme="dark"] .fchip.fa{
-  background:#2C2820;color:var(--ink);border-color:var(--rule2);
+  background:var(--gold-lt);color:var(--gold);border-color:var(--gold-bd);
 }
 
 /* Confirm box */
@@ -237,8 +230,8 @@ body,
 
 /* tep (task edit panel) */
 [data-theme="dark"] .tep{background:var(--cream2);}
-[data-theme="dark"] .tep-save{background:#2C2820;color:var(--ink);border:1.5px solid #4A4438;}
-[data-theme="dark"] .tep-save:hover{background:#3A3528;}
+[data-theme="dark"] .tep-save{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
+[data-theme="dark"] .tep-save:hover{background:#352808;}
 
 /* Bottom bar */
 [data-theme="dark"] .bot{background:rgba(18,16,12,0.96);}
@@ -835,16 +828,16 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 [data-theme="dark"] .crm-modal{background:var(--white);}
 [data-theme="dark"] .crm-modal-input,[data-theme="dark"] .crm-modal-select,[data-theme="dark"] .crm-modal-ta{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
 [data-theme="dark"] .crm-modal-input:focus,[data-theme="dark"] .crm-modal-select:focus,[data-theme="dark"] .crm-modal-ta:focus{background:var(--cream3);border-color:var(--gold-bd);}
-[data-theme="dark"] .crm-modal-save{background:#2C2820;color:var(--ink);border:1.5px solid #4A4438;}
-[data-theme="dark"] .crm-modal-save:hover{background:#3A3528;}
+[data-theme="dark"] .crm-modal-save{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
+[data-theme="dark"] .crm-modal-save:hover{background:#352808;}
 [data-theme="dark"] .crm-modal-cancel{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
 [data-theme="dark"] .chl-add-form{background:var(--cream3);}
 [data-theme="dark"] .chl-type-sel,[data-theme="dark"] .chl-sal-sel,[data-theme="dark"] .chl-note-inp,[data-theme="dark"] .chl-date-inp{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
 [data-theme="dark"] .chl-note-inp:focus,[data-theme="dark"] .chl-type-sel:focus,[data-theme="dark"] .chl-sal-sel:focus,[data-theme="dark"] .chl-date-inp:focus{border-color:var(--gold-bd);}
 [data-theme="dark"] .crm-remarks-ta{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
 [data-theme="dark"] .chl-item{background:var(--cream3);border-color:var(--rule2);}
-[data-theme="dark"] .crm-add-btn,[data-theme="dark"] .chl-save-btn,[data-theme="dark"] .crm-save-remarks{background:#2C2820;color:var(--ink);border:1.5px solid #4A4438;}
-[data-theme="dark"] .crm-add-btn:hover,[data-theme="dark"] .chl-save-btn:hover,[data-theme="dark"] .crm-save-remarks:hover{background:#3A3528;}
+[data-theme="dark"] .crm-add-btn,[data-theme="dark"] .chl-save-btn,[data-theme="dark"] .crm-save-remarks{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
+[data-theme="dark"] .crm-add-btn:hover,[data-theme="dark"] .chl-save-btn:hover,[data-theme="dark"] .crm-save-remarks:hover{background:#352808;}
 [data-theme="dark"] .crm-stat{background:var(--white);border-color:var(--rule2);}
 [data-theme="dark"] .crm-search-wrap{background:var(--cream2);}
 [data-theme="dark"] .crm-modal-close{background:var(--cream3);color:var(--ink3);}
@@ -936,10 +929,342 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
   .settings-body{padding:20px 22px 120px;}
   .notes-list-wrap{padding:12px 22px 120px;}
 }
+
+/* ══ LOGIN SCREEN ══ */
+.login-screen{
+  position:fixed;inset:0;z-index:1000;
+  background:var(--cream);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+.login-box{
+  background:var(--white);border:1.5px solid var(--rule);
+  border-radius:var(--r2);box-shadow:var(--sh2);
+  padding:32px 28px;width:100%;max-width:360px;
+}
+.login-brand{
+  font-family:'Lora',serif;font-size:1.3rem;font-weight:600;
+  color:var(--ink);text-align:center;margin-bottom:4px;
+}
+.login-brand em{font-style:italic;color:var(--gold2);}
+.login-sub{font-size:0.72rem;color:var(--ink4);text-align:center;letter-spacing:.06em;text-transform:uppercase;margin-bottom:24px;}
+.login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.login-lbl{font-size:0.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:500;}
+.login-input,.login-select{
+  padding:9px 12px;border:1.5px solid var(--rule2);border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--ink);
+  background:var(--cream2);outline:none;width:100%;
+  transition:border-color .2s;
+}
+.login-input:focus,.login-select:focus{border-color:var(--gold-bd);}
+.login-select option{background:var(--cream2);}
+.login-btn{
+  width:100%;padding:11px;border:none;border-radius:9px;
+  background:var(--ink);color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;
+  cursor:pointer;transition:background .15s;margin-top:6px;
+}
+.login-btn:hover{background:var(--ink2);}
+.login-err{font-size:0.75rem;color:var(--c-red);text-align:center;margin-top:8px;min-height:18px;}
+.login-toggle{font-size:0.72rem;color:var(--ink4);text-align:center;margin-top:12px;cursor:pointer;}
+.login-toggle span{color:var(--gold);text-decoration:underline;cursor:pointer;}
+
+/* ══ STAFF BANNER ══ */
+.staff-banner{
+  background:var(--gold-lt);border-bottom:1.5px solid var(--gold-bd);
+  padding:8px 20px;display:flex;align-items:center;justify-content:space-between;
+  font-size:0.76rem;color:var(--gold);font-weight:500;
+}
+.staff-banner-logout{
+  border:1px solid var(--gold-bd);border-radius:6px;background:none;
+  color:var(--gold);font-family:'DM Sans',sans-serif;font-size:0.68rem;
+  padding:3px 10px;cursor:pointer;
+}
+
+/* ══ PENDING APPROVAL badge on task card ══ */
+.pending-tc{border-color:var(--bd-amber) !important;}
+
+/* password management in settings */
+.pass-mgmt-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 18px;border-bottom:1px solid var(--rule);font-size:0.84rem;color:var(--ink2);
+}
+.pass-mgmt-row:last-child{border-bottom:none;}
+.pass-mgmt-name{font-weight:500;}
+.pass-mgmt-status{font-size:0.7rem;color:var(--ink4);}
+.pass-reset-btn{
+  padding:5px 12px;border:1.5px solid var(--rule2);border-radius:7px;
+  background:none;color:var(--ink3);font-family:'DM Sans',sans-serif;
+  font-size:0.7rem;cursor:pointer;transition:all .15s;
+}
+.pass-reset-btn:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
+
+.pending-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:4px;
+  background:var(--bg-amber);color:var(--c-amber);
+  border:1px solid var(--bd-amber);
+  font-size:0.62rem;font-weight:600;letter-spacing:.04em;
+}
+.approve-btn{
+  border:1.5px solid var(--bd-green);border-radius:6px;
+  background:var(--bg-green);color:var(--c-green);
+  font-family:'DM Sans',sans-serif;font-size:0.6rem;
+  font-weight:600;padding:4px 9px;cursor:pointer;
+  letter-spacing:.04em;text-transform:uppercase;transition:all .12s;
+}
+.approve-btn:hover{background:var(--c-green);color:#fff;}
+.mark-done-btn{
+  border:1.5px solid var(--bd-blue);border-radius:6px;
+  background:var(--bg-blue);color:var(--c-blue);
+  font-family:'DM Sans',sans-serif;font-size:0.6rem;
+  font-weight:600;padding:4px 9px;cursor:pointer;
+  letter-spacing:.04em;text-transform:uppercase;transition:all .12s;
+}
+.mark-done-btn:hover{background:var(--c-blue);color:#fff;}
+
+/* ══ QUICK CHECKLIST PAGE ══ */
+.chk-body{padding:14px 16px 120px;display:flex;flex-direction:column;gap:12px;}
+.chk-add-card{
+  background:var(--white);border:1.5px solid var(--rule);
+  border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.chk-add-card:focus-within{border-color:var(--gold-bd);box-shadow:0 0 0 3px rgba(212,168,40,.09),var(--sh);}
+.chk-add-top{display:flex;align-items:center;padding:11px 14px;gap:10px;border-bottom:1px solid var(--rule);}
+.chk-add-top input{
+  flex:1;border:none;outline:none;background:transparent;
+  font-family:'DM Sans',sans-serif;font-size:0.92rem;color:var(--ink);
+}
+.chk-add-top input::placeholder{color:var(--ink4);}
+.chk-add-meta{display:flex;border-top:1px solid var(--rule);}
+.chk-mf{flex:1;display:flex;flex-direction:column;padding:7px 13px;border-right:1px solid var(--rule);}
+.chk-mf:last-child{border-right:none;}
+.chk-ml{font-size:0.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:500;margin-bottom:2px;}
+.chk-mf select,.chk-mf input{
+  border:none;outline:none;background:transparent;
+  font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--ink);width:100%;
+}
+.chk-add-btn{
+  flex-shrink:0;padding:7px 16px;background:var(--ink);color:#fff;
+  border:none;border-radius:7px;font-family:'DM Sans',sans-serif;
+  font-size:0.75rem;font-weight:600;cursor:pointer;margin-left:4px;
+}
+.chk-filter-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0;}
+.chk-filter-row::-webkit-scrollbar{display:none;}
+.chk-fc{
+  flex-shrink:0;padding:6px 13px;border-radius:20px;
+  border:1.5px solid var(--rule2);background:var(--white);
+  color:var(--ink3);font-size:0.7rem;font-weight:500;
+  cursor:pointer;transition:all .12s;white-space:nowrap;
+}
+.chk-fc.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+.chk-item{
+  background:var(--white);border:1.5px solid var(--rule);
+  border-radius:var(--r);display:flex;align-items:center;
+  gap:10px;padding:11px 12px;box-shadow:var(--sh);
+  transition:opacity .2s,border-color .15s;animation:fadeUp .2s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+.chk-item.chk-done{opacity:.45;}
+.chk-item.chk-done .chk-name{text-decoration:line-through;color:var(--ink4);}
+.chk-cb{
+  width:20px;height:20px;border-radius:6px;border:1.5px solid var(--rule2);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .18s;
+}
+.chk-cb:hover{border-color:var(--c-green);background:var(--bg-green);}
+.chk-cb.ck{background:var(--c-green);border-color:var(--c-green);}
+.chk-cb.ck::after{content:'';width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);display:block;}
+.chk-info{flex:1;min-width:0;}
+.chk-name{font-size:0.88rem;color:var(--ink);font-weight:400;margin-bottom:2px;}
+.chk-meta-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.chk-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-size:0.62rem;font-weight:500;border:1px solid;white-space:nowrap;}
+.chk-del{border:none;background:none;color:var(--ink5);font-size:1rem;cursor:pointer;flex-shrink:0;padding:2px 4px;transition:color .12s;}
+.chk-del:hover{color:var(--c-red);}
+.chk-empty{text-align:center;padding:50px 20px;}
+.chk-empty-icon{font-family:'Lora',serif;font-style:italic;font-size:1.8rem;color:var(--rule2);margin-bottom:8px;}
+.chk-empty p{font-size:0.84rem;color:var(--ink4);}
+.chk-sec{display:flex;align-items:center;gap:8px;margin:6px 0 6px;}
+.chk-sec-line{flex:1;height:1px;background:var(--rule);}
+.chk-sec-lbl{font-size:0.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);font-weight:600;}
+
+/* dark mode for new elements */
+[data-theme="dark"] .login-box{background:var(--white);border-color:var(--rule);}
+[data-theme="dark"] .login-input,[data-theme="dark"] .login-select{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] .login-select option{background:#1E1C16;}
+[data-theme="dark"] .login-btn{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
+[data-theme="dark"] .staff-banner{background:var(--gold-lt);}
+[data-theme="dark"] .chk-add-card,[data-theme="dark"] .chk-item{background:var(--white);}
+[data-theme="dark"] .chk-mf select,[data-theme="dark"] .chk-mf input{color:var(--ink);}
+
+@media(min-width:900px){
+  .chk-body{padding:20px 28px 100px;max-width:780px;}
+}
+
+/* ══════════════════════════════
+   PAYMENTS PAGE
+══════════════════════════════ */
+.pay-topbar{background:var(--white);border-bottom:1.5px solid var(--rule);padding:12px 16px 10px;display:flex;flex-direction:column;gap:10px;position:sticky;top:0;z-index:30;}
+.pay-toprow{display:flex;align-items:center;gap:10px;}
+.pay-search-wrap{flex:1;min-width:160px;display:flex;align-items:center;gap:8px;background:var(--cream2);border:1.5px solid var(--rule);border-radius:9px;padding:8px 13px;transition:border-color .2s;}
+.pay-search-wrap:focus-within{border-color:var(--gold-bd);}
+.pay-search-wrap svg{color:var(--ink4);flex-shrink:0;}
+#paySearch{flex:1;border:none;outline:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--ink);}
+#paySearch::placeholder{color:var(--ink4);}
+.pay-add-btn{flex-shrink:0;padding:8px 16px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.pay-add-btn:hover{background:var(--ink2);}
+.pay-filter-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:1px 0;}
+.pay-filter-chips::-webkit-scrollbar{display:none;}
+.pay-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--rule2);background:var(--white);color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pay-chip:hover{border-color:var(--rule);color:var(--ink);}
+.pay-ca{background:var(--ink);border-color:var(--ink);color:#fff;}
+.pay-stats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:10px 16px;background:var(--cream2);border-bottom:1.5px solid var(--rule);}
+.pay-stats::-webkit-scrollbar{display:none;}
+.pay-stat{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:8px 16px;background:var(--white);border:1.5px solid var(--rule);border-radius:10px;min-width:80px;}
+.pay-stat-num{font-family:'Lora',serif;font-size:1.3rem;font-weight:500;color:var(--ink);line-height:1;}
+.pay-amt{font-size:1rem;}
+.pay-stat-lbl{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink4);margin-top:3px;white-space:nowrap;}
+.pay-cs-red .pay-stat-num{color:var(--c-red);}
+.pay-cs-amber .pay-stat-num{color:var(--c-amber);}
+.pay-cs-green .pay-stat-num{color:var(--c-green);}
+.pay-cs-blue .pay-stat-num{color:var(--c-blue);}
+.pay-list{padding:14px 16px 140px;display:flex;flex-direction:column;gap:10px;}
+.pc{background:var(--white);border:1.5px solid var(--rule);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;animation:noteIn .2s ease;transition:box-shadow .15s,border-color .15s;}
+.pc:hover{box-shadow:var(--sh2);}
+.pc.pc-high{border-left:4px solid var(--c-red);}
+.pc.pc-medium{border-left:4px solid var(--gold2);}
+.pc.pc-low{border-left:4px solid var(--c-green);}
+.pc.pc-received{opacity:.65;}
+.pc-main{display:flex;align-items:flex-start;padding:12px 14px;gap:12px;}
+.pc-avatar{width:36px;height:36px;border-radius:50%;background:var(--cream3);border:1.5px solid var(--rule2);display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-weight:600;font-size:0.9rem;color:var(--ink3);flex-shrink:0;text-transform:uppercase;}
+.pc-info{flex:1;min-width:0;}
+.pc-firm{font-family:'Lora',serif;font-size:0.97rem;font-weight:600;color:var(--ink);line-height:1.2;}
+.pc-sub{font-size:0.72rem;color:var(--ink3);margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pc-amount{font-family:'Lora',serif;font-size:1.1rem;font-weight:600;color:var(--c-green);flex-shrink:0;}
+.pc-amount.overdue{color:var(--c-red);}
+.pc-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.pc-status-badge{font-size:0.62rem;padding:3px 9px;border-radius:4px;border:1px solid;white-space:nowrap;font-weight:600;}
+.psb-pending{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);}
+.psb-called{background:var(--bg-blue);color:var(--c-blue);border-color:var(--bd-blue);}
+.psb-visited{background:var(--bg-purple);color:var(--c-purple);border-color:var(--bd-purple);}
+.psb-received{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
+.psb-follow_up{background:var(--bg-orange);color:var(--c-orange);border-color:var(--bd-orange);}
+.pc-next-badge{font-size:0.62rem;padding:2px 8px;border-radius:4px;border:1px solid;white-space:nowrap;}
+.pnb-overdue{background:var(--bg-red);color:var(--c-red);border-color:var(--bd-red);}
+.pnb-due{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);}
+.pnb-ok{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
+.pnb-none{background:var(--cream2);color:var(--ink4);border-color:var(--rule2);}
+.pc-tags{display:flex;align-items:center;gap:6px;padding:0 14px 10px;flex-wrap:wrap;}
+.pc-actions{display:flex;gap:6px;padding:0 14px 12px;border-top:1px solid var(--rule);padding-top:10px;flex-wrap:wrap;}
+.pc-btn{flex:1;min-width:0;padding:7px 6px;border:1.5px solid var(--rule2);border-radius:7px;background:none;font-family:'DM Sans',sans-serif;font-size:0.67rem;font-weight:500;color:var(--ink3);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;}
+.pc-btn:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
+.pc-btn.pb-call:hover{border-color:var(--bd-green);color:var(--c-green);background:var(--bg-green);}
+.pc-btn.pb-visit:hover{border-color:var(--bd-blue);color:var(--c-blue);background:var(--bg-blue);}
+.pc-btn.pb-recv:hover{border-color:var(--bd-green);color:var(--c-green);background:var(--bg-green);}
+.pc-btn.pb-edit:hover{border-color:var(--bd-purple);color:var(--c-purple);background:var(--bg-purple);}
+.pc-btn.pb-del:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
+.pc-btn.btn-active{background:var(--bg-green);border-color:var(--bd-green);color:var(--c-green);}
+.pc-btn.btn-active-blue{background:var(--bg-blue);border-color:var(--bd-blue);color:var(--c-blue);}
+.pc-log-btn{width:100%;padding:8px 14px;border:none;background:none;border-top:1px solid var(--rule);font-family:'DM Sans',sans-serif;font-size:0.72rem;color:var(--ink4);cursor:pointer;text-align:left;display:flex;align-items:center;gap:6px;transition:color .15s;}
+.pc-log-btn:hover{color:var(--ink2);}
+.pc-log-panel{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;}
+.pc-log-panel.open{max-height:600px;padding:0 14px 12px;}
+.pc-log-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.pli{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--cream2);border-radius:8px;border:1px solid var(--rule);}
+.pli-icon{font-size:0.8rem;flex-shrink:0;margin-top:1px;}
+.pli-body{flex:1;min-width:0;}
+.pli-action{font-size:0.78rem;color:var(--ink);font-weight:500;}
+.pli-meta{font-size:0.63rem;color:var(--ink4);margin-top:1px;}
+.pli-note{font-size:0.75rem;color:var(--ink2);margin-top:3px;line-height:1.4;}
+.pc-quick-log{background:var(--cream2);border-radius:9px;padding:10px;border:1px solid var(--rule);display:flex;flex-direction:column;gap:7px;}
+.pcql-row{display:flex;gap:7px;flex-wrap:wrap;}
+.pcql-sel{flex:1;min-width:120px;padding:6px 9px;border:1.5px solid var(--rule2);border-radius:7px;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--ink);outline:none;cursor:pointer;}
+.pcql-inp{width:100%;padding:7px 10px;border:1.5px solid var(--rule2);border-radius:7px;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--ink);outline:none;resize:none;}
+.pcql-date{padding:6px 9px;border:1.5px solid var(--rule2);border-radius:7px;background:var(--white);font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--ink);outline:none;min-width:130px;}
+.pcql-sel:focus,.pcql-inp:focus,.pcql-date:focus{border-color:var(--gold-bd);}
+.pcql-save{padding:6px 16px;background:var(--ink);color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.pcql-save:hover{background:var(--ink2);}
+.pay-empty{text-align:center;padding:60px 20px;}
+.pay-empty-icon{font-family:'Lora',serif;font-style:italic;font-size:2rem;color:var(--rule2);margin-bottom:10px;}
+.pay-empty p{font-size:0.84rem;color:var(--ink4);}
+[data-theme="dark"] .pay-topbar,[data-theme="dark"] .pc{background:var(--white);}
+[data-theme="dark"] .pay-search-wrap{background:var(--cream2);}
+[data-theme="dark"] .pc-quick-log,[data-theme="dark"] .pli{background:var(--cream3);border-color:var(--rule2);}
+[data-theme="dark"] .pcql-sel,[data-theme="dark"] .pcql-inp,[data-theme="dark"] .pcql-date{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] .pay-stat{background:var(--white);border-color:var(--rule2);}
+[data-theme="dark"] .pay-add-btn,[data-theme="dark"] .pcql-save{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
+[data-theme="dark"] .pay-add-btn:hover,[data-theme="dark"] .pcql-save:hover{background:#352808;}
+@media(min-width:900px){
+  .pay-topbar{padding:14px 28px 12px;}
+  .pay-list{padding:16px 28px 80px;}
+  .pay-stats{padding:10px 28px;}
+  .pc-actions{opacity:0;transition:opacity .15s;}
+  .pc:hover .pc-actions{opacity:1;}
+}
+.admin-body{padding:14px 16px 120px;display:flex;flex-direction:column;gap:12px;max-width:860px;}
+.admin-card{background:var(--white);border:1.5px solid var(--rule);border-radius:var(--r);box-shadow:var(--sh);padding:14px;display:flex;gap:12px;align-items:flex-start;}
+.admin-card-main{flex:1;min-width:0;}
+.admin-card-title{font-size:0.94rem;color:var(--ink);line-height:1.4;margin-bottom:8px;}
+.admin-card-meta{display:flex;gap:6px;flex-wrap:wrap;}
+.admin-empty{text-align:center;padding:60px 20px;color:var(--ink4);}
+.admin-only{display:none;}
+body.is-admin .admin-only{display:flex;}
+body.is-staff .staff-hide{display:none!important;}
+body.is-staff .staff-lock-assignee{opacity:.55;pointer-events:none;}
+@media(min-width:900px){.admin-body{padding:20px 28px 100px;}}
 </style>
 </head>
 <body>
-<div class="app">
+<!-- ═══════ LOGIN SCREEN ═══════ -->
+<div class="login-screen" id="loginScreen" style="display:none;">
+  <div class="login-box">
+    <div class="login-brand">Nakshatra <em>Creations</em></div>
+    <div class="login-sub">Daily Operations</div>
+    <div class="login-field">
+      <div class="login-lbl">Who are you?</div>
+      <select class="login-select" id="loginName"><option value="">— Select —</option></select>
+    </div>
+    <div class="login-field">
+      <div class="login-lbl">Password</div>
+      <input class="login-input" id="loginPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr"></div>
+    <div class="login-toggle" onclick="showSetPassword()">First time? <span>Set up your password →</span></div>
+  </div>
+</div>
+
+<!-- ═══════ SET PASSWORD SCREEN ═══════ -->
+<div class="login-screen" id="setPassScreen" style="display:none;">
+  <div class="login-box">
+    <div class="login-brand">Set Password</div>
+    <div class="login-sub" style="margin-bottom:18px;">One-time setup for your account</div>
+    <div class="login-field">
+      <div class="login-lbl">Your Name</div>
+      <select class="login-select" id="spName"><option value="">— Select —</option></select>
+    </div>
+    <div class="login-field">
+      <div class="login-lbl">Choose Password</div>
+      <input class="login-input" id="spPass1" type="password" placeholder="New password"/>
+    </div>
+    <div class="login-field">
+      <div class="login-lbl">Confirm Password</div>
+      <input class="login-input" id="spPass2" type="password" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doSetPassword()"/>
+    </div>
+    <button class="login-btn" onclick="doSetPassword()">Save Password</button>
+    <div class="login-err" id="spErr"></div>
+    <div class="login-toggle" onclick="showLogin()"><span>← Back to Sign In</span></div>
+  </div>
+</div>
+
+<div class="app" id="appShell" style="display:none;">
+
+<!-- ═══════ STAFF BANNER ═══════ -->
+<div class="staff-banner" id="staffBanner" style="display:none;">
+  <span id="staffBannerTxt"></span>
+  <button class="staff-banner-logout" onclick="doLogout()">Sign Out</button>
+</div>
 
 <!-- ═══════ HEADER ═══════ -->
 <header class="hdr">
@@ -952,6 +1277,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
       <div style="display:flex;align-items:center;gap:8px;">
         <div id="syncDot" title="Sync status" style="width:8px;height:8px;border-radius:50%;background:var(--ink4);flex-shrink:0;transition:background .3s;"></div>
         <button class="dm-toggle" id="dmToggle" onclick="toggleDarkMode()" title="Toggle dark mode"></button>
+        <button class="staff-banner-logout" onclick="doLogout()" title="Sign out">Sign Out</button>
         <div>
           <div class="pct-num"><span id="pctEl">0</span>%</div>
           <div class="pct-sub">Complete</div>
@@ -964,14 +1290,23 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
     <button class="tab-btn active" onclick="switchTab('today')">
       <span class="tab-icon">📋</span> Today
     </button>
+    <button class="tab-btn" onclick="switchTab('checklist')">
+      <span class="tab-icon">✅</span> Parties
+    </button>
     <button class="tab-btn" onclick="switchTab('notes')">
       <span class="tab-icon">💡</span> Notes
     </button>
     <button class="tab-btn" onclick="switchTab('crm')">
       <span class="tab-icon">🤝</span> Clients
     </button>
-    <button class="tab-btn" onclick="switchTab('settings')">
+    <button class="tab-btn admin-only" onclick="switchTab('admin')">
+      <span class="tab-icon">🛡</span> Admin
+    </button>
+    <button class="tab-btn admin-only" onclick="switchTab('settings')">
       <span class="tab-icon">⚙</span> Settings
+    </button>
+    <button class="tab-btn" onclick="switchTab('payments')">
+      <span class="tab-icon">💰</span> Payments
     </button>
   </div>
 </header>
@@ -1424,6 +1759,19 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
       </div>
     </div>
 
+    <!-- PASSWORDS (admin only) -->
+    <div class="settings-section" id="passSection" style="display:none;">
+      <div class="ss-head">
+        <div>
+          <div class="ss-title">🔐 Team Passwords</div>
+          <div class="ss-sub">Reset a team member's password</div>
+        </div>
+      </div>
+      <div id="passMgmtList">
+        <div style="padding:14px 18px;font-size:0.8rem;color:var(--ink4);">Loading…</div>
+      </div>
+    </div>
+
     <!-- DANGER ZONE -->
     <div class="settings-section danger-zone">
       <div class="ss-head">
@@ -1481,6 +1829,127 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 
 </div><!-- /page-notes -->
 
+<!-- ═══════ ADMIN PAGE ═══════ -->
+<div class="page" id="page-admin">
+  <div class="admin-body">
+    <div class="settings-section">
+      <div class="ss-head">
+        <div>
+          <div class="ss-title">Approvals</div>
+          <div class="ss-sub">Staff-completed tasks waiting for admin confirmation</div>
+        </div>
+      </div>
+    </div>
+    <div id="adminApprovals"></div>
+  </div>
+</div>
+
+<!-- ═══════ CHECKLIST PAGE ═══════ -->
+<div class="page" id="page-checklist">
+  <div class="chk-body">
+    <div class="chk-add-card">
+      <div class="chk-add-top">
+        <input id="chkInput" type="text" placeholder="Add a party or client reminder…" autocomplete="off"
+          onkeydown="if(event.key==='Enter')chkAdd()"/>
+        <button class="chk-add-btn" onclick="chkAdd()">Add</button>
+      </div>
+      <div class="chk-add-meta">
+        <div class="chk-mf">
+          <div class="chk-ml">Assign to</div>
+          <select id="chkAssignee"></select>
+        </div>
+        <div class="chk-mf">
+          <div class="chk-ml">Note</div>
+          <input id="chkNote" type="text" placeholder="Optional detail…"/>
+        </div>
+      </div>
+    </div>
+    <div class="chk-filter-row" id="chkFilters"></div>
+    <div id="chkList"></div>
+  </div>
+</div>
+
+<!-- ═══════ PAYMENTS PAGE ═══════ -->
+<div class="page" id="page-payments">
+  <div class="pay-topbar">
+    <div class="pay-toprow">
+      <div class="pay-search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.4-4.4"/></svg>
+        <input type="text" id="paySearch" placeholder="Search firm, assignee, notes…" oninput="payRender()" autocomplete="off"/>
+      </div>
+      <button class="pay-add-btn" onclick="payOpenModal()">+ Add Entry</button>
+    </div>
+    <div class="pay-filter-chips" id="payFilterChips">
+      <button class="pay-chip pay-ca" data-pf="all"    onclick="paySetFilter(this,'all')">All</button>
+      <button class="pay-chip" data-pf="pending"       onclick="paySetFilter(this,'pending')">⏳ Pending</button>
+      <button class="pay-chip" data-pf="called"        onclick="paySetFilter(this,'called')">📞 Called</button>
+      <button class="pay-chip" data-pf="visited"       onclick="paySetFilter(this,'visited')">🚗 Visited</button>
+      <button class="pay-chip" data-pf="follow_up"     onclick="paySetFilter(this,'follow_up')">🔁 Follow-up Due</button>
+      <button class="pay-chip" data-pf="received"      onclick="paySetFilter(this,'received')">✅ Received</button>
+    </div>
+  </div>
+  <div class="pay-stats" id="payStats">
+    <div class="pay-stat"><div class="pay-stat-num" id="pst-total">0</div><div class="pay-stat-lbl">Total</div></div>
+    <div class="pay-stat pay-cs-red"><div class="pay-stat-num" id="pst-pending">0</div><div class="pay-stat-lbl">Pending</div></div>
+    <div class="pay-stat pay-cs-amber"><div class="pay-stat-num" id="pst-followup">0</div><div class="pay-stat-lbl">Follow-up Due</div></div>
+    <div class="pay-stat pay-cs-green"><div class="pay-stat-num" id="pst-received">0</div><div class="pay-stat-lbl">Received</div></div>
+    <div class="pay-stat pay-cs-blue"><div class="pay-stat-num pay-amt" id="pst-amount">₹0</div><div class="pay-stat-lbl">Outstanding</div></div>
+  </div>
+  <div class="pay-list" id="payList"></div>
+</div>
+
+<!-- Payments Add/Edit Modal -->
+<div class="crm-modal-overlay" id="payModalOverlay" onclick="payCloseModal(event)">
+  <div class="crm-modal" id="payModal">
+    <div class="crm-modal-hd">
+      <div class="crm-modal-title" id="payModalTitle">Add Payment Entry</div>
+      <button class="crm-modal-close" onclick="payCloseModal()">✕</button>
+    </div>
+    <div class="crm-modal-grid">
+      <div class="crm-modal-field full">
+        <div class="crm-modal-lbl">Firm / Party Name *</div>
+        <input class="crm-modal-input" id="pm_firm" type="text" placeholder="e.g. Sharma Sarees"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Outstanding Amount (₹)</div>
+        <input class="crm-modal-input" id="pm_amount" type="number" placeholder="e.g. 245000" min="0"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Contact Person</div>
+        <input class="crm-modal-input" id="pm_contact" type="text" placeholder="Who to reach"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Assigned To</div>
+        <select class="crm-modal-select" id="pm_assignee"></select>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Priority</div>
+        <select class="crm-modal-select" id="pm_priority">
+          <option value="high">🔴 High</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Invoice / Due Date</div>
+        <input class="crm-modal-input" id="pm_dueDate" type="date"/>
+      </div>
+      <div class="crm-modal-field">
+        <div class="crm-modal-lbl">Next Follow-up Date</div>
+        <input class="crm-modal-input" id="pm_nextDate" type="date"/>
+      </div>
+      <div class="crm-modal-field full">
+        <div class="crm-modal-lbl">Notes</div>
+        <textarea class="crm-modal-ta" id="pm_notes" rows="2" placeholder="Invoice numbers, partial payment, what was discussed…"></textarea>
+      </div>
+    </div>
+    <div class="crm-modal-actions">
+      <button class="crm-modal-save" onclick="paySaveModal()">Save Entry</button>
+      <button class="crm-modal-cancel" onclick="payCloseModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /app -->
 
 <!-- Custom confirm dialog -->
@@ -1534,6 +2003,11 @@ let currentTab='today';
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function isAdmin(){ return currentUser && currentUser.role==='admin'; }
+function isStaff(){ return currentUser && currentUser.role==='staff'; }
+function actorName(){ return currentUser ? currentUser.name : 'Unknown'; }
+function actorId(){ return currentUser ? currentUser.id : ''; }
+function ownsRecord(x){ return isAdmin() || !x || !x.createdById || x.createdById===actorId() || x.createdBy===actorName(); }
 
 // ── DEFAULTS ──
 const DEFAULT_DEPTS=[
@@ -1595,77 +2069,82 @@ function persistSettings(){
 }
 
 // ══════════════════════════════════════
-// BOOT — load from Supabase if available
+// BOOT — localStorage first, Supabase optional background sync
 // ══════════════════════════════════════
 async function boot(){
-  checkOrigin();
-  // First render from localStorage immediately (instant)
+  // 1. Load everything from localStorage immediately
   load();
-  document.getElementById('dateEl').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+  chkLoad();
+  payLoad();
+
+  // 2. Set date
+  var dateEl=document.getElementById('dateEl');
+  if(dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+
+  // 3. Build UI fully from local data — app is usable right now
   rebuildAll();
   render();
   initNotes();
+  renderNotes();
   initDarkMode();
+  initAuth();
 
-  // Then hydrate from Supabase in background
-  try {
+  // 4. Load CRM from localStorage
+  crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]');
+  crmSamples = JSON.parse(localStorage.getItem('nk_samples_v1')||'[]');
+  crmRender();
+
+  syncStatus('ok');
+
+  // 5. Try Supabase sync silently in background — never blocks or breaks the app
+  if(location.protocol !== 'file:'){
+    _syncFromSupabase();
+  }
+}
+
+async function _syncFromSupabase(){
+  try{
     syncStatus('syncing');
-
-    // Quick connection test first
     const testResp = await fetch(SB_URL+'/rest/v1/nk_tasks?select=id&limit=1', {
-      headers:{
-        'apikey': SB_KEY,
-        'Authorization': 'Bearer '+SB_KEY,
-        'Accept': 'application/json'
-      }
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Accept':'application/json'}
     });
-    if(!testResp.ok){
-      const errText = await testResp.text();
-      console.error('Supabase connection test failed:', testResp.status, errText);
-      toast('Cloud error '+testResp.status+': '+errText.slice(0,60));
-      syncStatus('err');
-      await loadCRM();
-      crmRender();
-      return;
-    }
+    if(!testResp.ok){ syncStatus('err'); return; }
 
-    // Load settings (depts, people, templates, tasks_meta)
     const settingsMeta = await sbGet('nk_settings','tasks_meta');
     if(settingsMeta){
       if(settingsMeta.depts)     { depts=settingsMeta.depts; localStorage.setItem(K.depts,JSON.stringify(depts)); }
       if(settingsMeta.people)    { people=settingsMeta.people; localStorage.setItem(K.people,JSON.stringify(people)); }
       if(settingsMeta.templates) { templates=settingsMeta.templates; localStorage.setItem(K.tpls,JSON.stringify(templates)); }
     }
-
-    // Load tasks
     const taskRows = await sbGetAll('nk_tasks');
     if(taskRows && taskRows.length){
       tasks = taskRows.map(r=>r.data).filter(Boolean);
       localStorage.setItem(K.tasks, JSON.stringify(tasks));
     }
-
-    // Load notes
     const noteRows = await sbGetAll('nk_notes');
     if(noteRows && noteRows.length){
       notes = noteRows.map(r=>r.data).filter(Boolean);
       localStorage.setItem(NK, JSON.stringify(notes));
     }
-
-    // Rebuild UI with fresh data
-    rebuildAll();
-    render();
-    renderNotes();
+    const clientRows = await sbGetAll('nk_clients');
+    if(clientRows && clientRows.length){
+      crmClients = clientRows.map(r=>r.data).filter(Boolean);
+      localStorage.setItem(CRM_KEY, JSON.stringify(crmClients));
+    }
+    const settingRows = await sbGetAll('nk_settings');
+    if(settingRows){
+      const sampleRows = settingRows.filter(r=>r.id.startsWith('sample_'));
+      if(sampleRows.length){ crmSamples = sampleRows.map(r=>r.data).filter(Boolean); localStorage.setItem('nk_samples_v1',JSON.stringify(crmSamples)); }
+      const payRows = settingRows.filter(r=>r.id.startsWith('pay_'));
+      if(payRows.length){ payEntries = payRows.map(r=>r.data).filter(Boolean); localStorage.setItem(PAY_KEY,JSON.stringify(payEntries)); }
+    }
+    rebuildAll(); render(); renderNotes(); crmRender(); chkRender(); payRender();
     syncStatus('ok');
-    toast('☁ Cloud sync connected ✓');
-  } catch(e){
-    console.error('Supabase boot failed:', e.message, e);
-    toast('Cloud sync failed: '+e.message.slice(0,60));
+    toast('☁ Cloud sync ✓');
+  }catch(e){
+    console.warn('Background sync failed (offline mode active)',e.message);
     syncStatus('err');
   }
-
-  // Load CRM (has its own Supabase calls)
-  await loadCRM();
-  crmRender();
 }
 
 function rebuildAll(){
@@ -1695,10 +2174,12 @@ function deptTagStyle(id){
 
 function buildAddMeta(){
   const deptOpts = depts.map(d=>`<option value="${d.id}">${d.label}</option>`).join('');
-  const peopleOpts = ['<option value="">Assignee</option>','<option value="Self">Self</option>',
-    ...people.filter(p=>p.status==='active').map(p=>`<option value="${p.name}">${p.name}</option>`)].join('');
+  const peopleOpts = isStaff()
+    ? `<option value="${esc(actorName())}">${esc(actorName())}</option>`
+    : ['<option value="">Assignee</option>','<option value="Self">Self</option>',
+      ...people.filter(p=>p.status==='active').map(p=>`<option value="${p.name}">${p.name}</option>`)].join('');
   document.getElementById('addMeta').innerHTML=`
-    <div class="mf"><div class="ml">Assignee</div><select id="ainput">${peopleOpts}</select></div>
+    <div class="mf ${isStaff()?'staff-lock-assignee':''}"><div class="ml">Assignee</div><select id="ainput">${peopleOpts}</select></div>
     <div class="mf"><div class="ml">Department</div><select id="dinput">${deptOpts}</select></div>
     <div class="mf"><div class="ml">Priority</div>
       <select id="pinput">
@@ -1811,6 +2292,7 @@ function render(){
   updateCounts();
   renderPeople();
   renderTasks();
+  adminRender();
 }
 
 function getFiltered(){
@@ -1827,9 +2309,10 @@ function getFiltered(){
 }
 
 function updateHeader(){
-  const tot=tasks.length,done=tasks.filter(t=>t.done).length;
+  const visibleTasks = isStaff() ? tasks.filter(t=>t.assignee===actorName() || t.createdById===actorId()) : tasks;
+  const tot=visibleTasks.length,done=visibleTasks.filter(t=>t.done).length;
   const pct=tot?Math.round(done/tot*100):0;
-  const urg=tasks.filter(t=>!t.done&&t.priority==='high').length;
+  const urg=visibleTasks.filter(t=>!t.done&&t.priority==='high').length;
   document.getElementById('pctEl').textContent=pct;
   document.getElementById('progFill').style.width=pct+'%';
   document.getElementById('sAll').textContent=tot+' task'+(tot!==1?'s':'');
@@ -1840,20 +2323,31 @@ function updateHeader(){
 
 function updateCounts(){
   const all=document.getElementById('ddc-all');
-  if(all) all.textContent=tasks.length;
+  const visibleTasks = isStaff() ? tasks.filter(t=>t.assignee===actorName() || t.createdById===actorId()) : tasks;
+  if(all) all.textContent=visibleTasks.length;
   depts.forEach(d=>{
     const el=document.getElementById('ddc-'+d.id);
-    if(el) el.textContent=tasks.filter(t=>t.dept===d.id).length;
+    if(el) el.textContent=visibleTasks.filter(t=>t.dept===d.id).length;
   });
   ['high','medium','low'].forEach(p=>{
     const el=document.getElementById('pc-'+p);
-    if(el) el.textContent=tasks.filter(t=>t.priority===p&&!t.done).length;
+    if(el) el.textContent=visibleTasks.filter(t=>t.priority===p&&!t.done).length;
   });
+  // Show pending approval count for admin
+  var pendingCount=tasks.filter(function(t){return t.pendingApproval&&!t.done;}).length;
+  var urgEl=document.getElementById('sUrg');
+  if(urgEl&&currentUser&&currentUser.role==='admin'&&pendingCount>0){
+    urgEl.textContent=pendingCount+' need approval';
+    urgEl.style.background='var(--bg-amber)';
+    urgEl.style.color='var(--c-amber)';
+    urgEl.style.borderColor='var(--bd-amber)';
+  }
 }
 
 function renderPeople(){
   const used={};
-  tasks.forEach(t=>{
+  const visibleTasks = isStaff() ? tasks.filter(t=>t.assignee===actorName() || t.createdById===actorId()) : tasks;
+  visibleTasks.forEach(t=>{
     if(!t.assignee||t.assignee==='Self') return;
     if(!used[t.assignee]) used[t.assignee]={tot:0,done:0};
     used[t.assignee].tot++;
@@ -1880,10 +2374,18 @@ function renderTasks(){
   const el=document.getElementById('taskList');
   const all=getFiltered();
   const po={high:0,medium:1,low:2};
-  const pending=all.filter(t=>!t.done).sort((a,b)=>po[a.priority]-po[b.priority]);
-  const done=all.filter(t=>t.done);
+
+  // For staff, pre-filter to only their tasks
+  function visibleToUser(t){
+    if(!isStaff()) return true;
+    return t.assignee===actorName() || t.createdById===actorId();
+  }
+
+  const pending=all.filter(t=>!t.done && visibleToUser(t)).sort((a,b)=>po[a.priority]-po[b.priority]);
+  const done=all.filter(t=>t.done && visibleToUser(t));
+
   if(!pending.length&&!done.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">All clear</div><p>No tasks here. Add one above.</p></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-icon">All clear</div><p>${isStaff()?'No tasks assigned to you.':'No tasks here. Add one above.'}</p></div>`;
     return;
   }
   let h='';
@@ -1896,12 +2398,20 @@ function taskHTML(t){
   const dl=deptLabel(t.dept);
   const ds=deptTagStyle(t.dept);
   const pl=t.priority.charAt(0).toUpperCase()+t.priority.slice(1);
-  const pbarC=t.done?'pb-done':'pb-'+t.priority;
+  const staffMode = currentUser && currentUser.role==='staff';
+  const adminMode = !currentUser || currentUser.role==='admin';
+
+  // Staff view: only show their own tasks
+  if(staffMode){
+    if(t.assignee!==actorName() && t.createdById!==actorId()) return '';
+  }
+
+  const pbarC = t.pendingApproval ? 'pb-medium' : (t.done?'pb-done':'pb-'+t.priority);
   const noteH=t.note?`<div class="tc-note">${esc(t.note)}</div>`:'';
   const timeTag=t.time?`<span class="tag tag-time">⏱ ${esc(t.time)}</span>`:'';
   const asgnTag=t.assignee?`<span class="tag tag-asgn">${esc(t.assignee)}</span>`:'';
+  const createdTag=isAdmin()&&t.createdBy?`<span class="tag" style="background:var(--bg-slate);color:var(--c-slate);border-color:var(--bd-slate);">Added by ${esc(t.createdBy)}</span>`:'';
 
-  // Due date tag — red if overdue, amber if today, normal otherwise
   let dueDateTag = '';
   if(t.dueDate && !t.done){
     const today = new Date().toISOString().slice(0,10);
@@ -1914,16 +2424,34 @@ function taskHTML(t){
     dueDateTag = `<span class="tag tag-due-done">📅 ${new Date(t.dueDate+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span>`;
   }
 
-  // Build edit panel selects
+  // Pending approval badge
+  const pendingBadge = t.pendingApproval
+    ? `<span class="pending-badge">⏳ ${esc(t.pendingBy||'Staff')} marked done</span>` : '';
+
   const deptOpts = depts.map(d=>`<option value="${d.id}"${d.id===t.dept?' selected':''}>${d.label}</option>`).join('');
   const peopleOpts = ['<option value="">— None —</option>','<option value="Self"'+(t.assignee==='Self'?' selected':'')+'>Self</option>',
     ...people.filter(p=>p.status==='active').map(p=>`<option value="${p.name}"${p.name===t.assignee?' selected':''}>${p.name}</option>`)].join('');
 
-  return `<div class="tc ${t.done?'dtc':''}" id="tc-${t.id}">
+  // Action buttons differ by role
+  let actionBtns = '';
+  if(staffMode){
+    if(t.pendingApproval){
+      actionBtns = `<button class="mark-done-btn" disabled style="opacity:.5;cursor:default;">⏳ Pending</button>`;
+    } else if(!t.done){
+      actionBtns = `<button class="mark-done-btn" onclick="staffMarkDone('${t.id}')">Mark Done</button>`;
+    }
+  } else {
+    // Admin sees normal edit/del + approve button if pending
+    const approveBtn = t.pendingApproval
+      ? `<button class="approve-btn" onclick="adminApprove('${t.id}')">✓ Approve</button>` : '';
+    actionBtns = `${approveBtn}<button class="abtn edit" onclick="openTaskEdit('${t.id}')">Edit</button><button class="abtn del" onclick="delTask('${t.id}')">Del</button>`;
+  }
+
+  return `<div class="tc ${t.done?'dtc':''} ${t.pendingApproval?'pending-tc':''}" id="tc-${t.id}">
     <div class="tc-row">
       <div class="pbar ${pbarC}"></div>
       <div class="tc-body">
-        <div class="cb ${t.done?'ck':''}" onclick="toggleDone('${t.id}')"></div>
+        <div class="cb ${t.done?'ck':''}" onclick="${adminMode?`toggleDone('${t.id}')`:''}" style="${staffMode?'cursor:default;pointer-events:none;':''}" ></div>
         <div class="tc-content">
           <div class="tc-text">${esc(t.text)}</div>
           ${noteH}
@@ -1933,11 +2461,12 @@ function taskHTML(t){
             <span class="tag tag-${t.priority}">${pl}</span>
             ${timeTag}
             ${dueDateTag}
+            ${pendingBadge}
+            ${createdTag}
           </div>
         </div>
         <div class="tc-actions">
-          <button class="abtn edit" onclick="openTaskEdit('${t.id}')">Edit</button>
-          <button class="abtn del"  onclick="delTask('${t.id}')">Del</button>
+          ${actionBtns}
         </div>
       </div>
     </div>
@@ -1998,14 +2527,16 @@ function taskHTML(t){
 function addTask(){
   const text=document.getElementById('taskInput').value.trim();
   if(!text){toast('Enter a task first');return;}
+  const staffMode = isStaff();
   const newTask = {
     id:uid(),text,
     dept:document.getElementById('dinput')?.value||depts[0]?.id,
-    assignee:document.getElementById('ainput')?.value||'',
+    assignee:staffMode ? actorName() : (document.getElementById('ainput')?.value||''),
     priority:document.getElementById('pinput')?.value||'medium',
     time:document.getElementById('tinput')?.value||'',
     dueDate:document.getElementById('dueinput')?.value||'',
-    note:'',done:false,ts:Date.now()
+    note:'',done:false,ts:Date.now(),
+    createdBy:actorName(),createdById:actorId()
   };
   tasks.unshift(newTask);
   localStorage.setItem(K.tasks, JSON.stringify(tasks));
@@ -2032,6 +2563,7 @@ function applyTemplate(i){
 }
 
 function toggleDone(id){
+  if(!isAdmin()){ toast('Admin approval required'); return; }
   const t=tasks.find(x=>x.id===id);
   if(!t) return;
   t.done=!t.done;
@@ -2041,6 +2573,7 @@ function toggleDone(id){
 }
 
 function delTask(id){
+  if(!isAdmin()){ toast('Only admin can delete tasks'); return; }
   const t=tasks.find(x=>x.id===id);
   if(!t) return;
   customConfirm(`Delete "<strong>${esc(t.text.slice(0,50))}</strong>"?`, ()=>{
@@ -2051,6 +2584,7 @@ function delTask(id){
 }
 
 function openTaskEdit(id){
+  if(!isAdmin()){ toast('Only admin can edit tasks'); return; }
   // Close any other open edit panels first
   document.querySelectorAll('.tc-edit-panel.open').forEach(el=>{
     if(el.id!=='tep-'+id) el.classList.remove('open');
@@ -2071,6 +2605,7 @@ function closeTaskEdit(id){
 }
 
 function saveTaskEdit(id){
+  if(!isAdmin()){ toast('Only admin can edit tasks'); return; }
   const t=tasks.find(x=>x.id===id);
   if(!t) return;
   const text=document.getElementById('tep-text-'+id)?.value.trim();
@@ -2365,30 +2900,50 @@ function resetAll(){
 // TAB SWITCHING
 // ══════════════════════════════════════
 function switchTab(tab){
-  currentTab=tab;
-  const tabNames=['today','notes','crm','settings'];
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
-    b.classList.toggle('active', tabNames[i]===tab);
+  if((tab==='settings' || tab==='admin') && !isAdmin()){
+    toast('Admin access only');
+    tab='today';
+  }
+  currentTab = tab;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const page = document.getElementById('page-'+tab);
+  if(page) page.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    const attr = btn.getAttribute('onclick')||'';
+    btn.classList.toggle('active', attr.includes(`'${tab}'`));
   });
-  document.getElementById('page-today').classList.toggle('active',tab==='today');
-  document.getElementById('page-notes').classList.toggle('active',tab==='notes');
-  document.getElementById('page-settings').classList.toggle('active',tab==='settings');
-  document.getElementById('page-crm').classList.toggle('active',tab==='crm');
-  document.getElementById('statsBar').style.display=tab==='today'?'flex':'none';
-  document.getElementById('botBar').style.display=tab==='today'?'flex':'none';
-  document.getElementById('hdrRight').style.display=tab==='today'?'block':'none';
-  if(tab==='settings'){
-    buildSettingsDeptSelect();
-    buildSettingsPeopleSelect();
-    buildTemplateList();
-    rebuildSettingsDeptDropdowns();
+  document.getElementById('statsBar').style.display = tab==='today' ? 'flex' : 'none';
+  document.getElementById('botBar').style.display = tab==='today' ? '' : 'none';
+  if(tab==='settings') buildPassMgmt();
+  if(tab==='notes') renderNotes();
+  if(tab==='checklist'){ chkBuildAssignee(); chkRender(); }
+  if(tab==='crm') crmRender();
+  if(tab==='payments') payRender();
+  if(tab==='admin') adminRender();
+}
+
+function adminRender(){
+  const el=document.getElementById('adminApprovals');
+  if(!el || !isAdmin()) return;
+  const pending=tasks.filter(t=>t.pendingApproval&&!t.done).sort((a,b)=>(b.pendingAt||0)-(a.pendingAt||0));
+  if(!pending.length){
+    el.innerHTML='<div class="admin-empty"><div class="empty-icon">All clear</div><p>No approvals waiting.</p></div>';
+    return;
   }
-  if(tab==='notes'){
-    renderNotes();
-  }
-  if(tab==='crm'){
-    crmRender();
-  }
+  el.innerHTML=pending.map(t=>`
+    <div class="admin-card">
+      <div class="admin-card-main">
+        <div class="admin-card-title">${esc(t.text)}</div>
+        ${t.note?`<div class="tc-note">${esc(t.note)}</div>`:''}
+        <div class="admin-card-meta">
+          <span class="tag tag-asgn">${esc(t.assignee||'Unassigned')}</span>
+          <span class="tag" style="${deptTagStyle(t.dept)}">${esc(deptLabel(t.dept))}</span>
+          <span class="tag tag-${t.priority||'medium'}">${esc(t.priority||'medium')}</span>
+          <span class="pending-badge">By ${esc(t.pendingBy||t.createdBy||'Staff')}</span>
+        </div>
+      </div>
+      <button class="approve-btn" onclick="adminApprove('${t.id}')">Approve</button>
+    </div>`).join('');
 }
 
 // ══════════════════════════════════════
@@ -2445,8 +3000,9 @@ function setNoteCat(cat){
 function renderNotes(){
   const q = (document.getElementById('notesSearch')?.value||'').toLowerCase();
   let filtered = notes.filter(n=>{
+    if(isStaff() && !ownsRecord(n)) return false;
     if(activeCatFilter!=='all' && n.cat!==activeCatFilter) return false;
-    if(q && !n.text.toLowerCase().includes(q)) return false;
+    if(q && ![n.text,n.createdBy].join(' ').toLowerCase().includes(q)) return false;
     return true;
   });
 
@@ -2479,6 +3035,8 @@ function renderNotes(){
 function noteCardHTML(n){
   const cat = catMeta(n.cat);
   const ts  = fmtNoteTs(n.ts);
+  const ownerTag = isAdmin() && n.createdBy ? `<span class="note-ts">By ${esc(n.createdBy)}</span>` : '';
+  const canEdit = ownsRecord(n);
   return `<div class="note-card ${n.pinned?'pinned-card':''}" id="nc-${n.id}">
     <div class="note-inner">
       <div class="note-strip ${cat.strip}"></div>
@@ -2487,14 +3045,15 @@ function noteCardHTML(n){
         <div class="note-footer">
           <span class="note-cat-tag ${cat.tag}">${cat.label}</span>
           <span class="note-ts">${ts}</span>
+          ${ownerTag}
         </div>
       </div>
       <div class="note-actions">
-        <button class="nab pin-btn ${n.pinned?'pinned':''}" onclick="toggleNotePin('${n.id}')" title="${n.pinned?'Unpin':'Pin'}">
+        ${canEdit?`<button class="nab pin-btn ${n.pinned?'pinned':''}" onclick="toggleNotePin('${n.id}')" title="${n.pinned?'Unpin':'Pin'}">
           ${n.pinned?'📌':'Pin'}
         </button>
         <button class="nab edit-btn" onclick="openNoteEdit('${n.id}')">Edit</button>
-        <button class="nab del-btn"  onclick="deleteNote('${n.id}')">Del</button>
+        <button class="nab del-btn"  onclick="deleteNote('${n.id}')">Del</button>`:''}
       </div>
     </div>
   </div>`;
@@ -2528,7 +3087,7 @@ function saveNote(){
   const text = document.getElementById('noteCapture').value.trim();
   if(!text){ toast('Write something first'); return; }
   const cat  = document.getElementById('noteCatSel').value;
-  notes.unshift({ id:uid(), text, cat, pinned:false, ts:Date.now() });
+  notes.unshift({ id:uid(), text, cat, pinned:false, ts:Date.now(), createdBy:actorName(), createdById:actorId() });
   saveNotes();
   document.getElementById('noteCapture').value='';
   document.getElementById('noteCapture').style.height='';
@@ -2540,6 +3099,7 @@ function saveNote(){
 function openNoteEdit(id){
   const n = notes.find(x=>x.id===id);
   if(!n) return;
+  if(!ownsRecord(n)){ toast('You can edit only your own notes'); return; }
   const card = document.getElementById('nc-'+id);
   const body = card.querySelector('.note-body');
   const cat  = catMeta(n.cat);
@@ -2562,6 +3122,7 @@ function openNoteEdit(id){
 function saveNoteEdit(id){
   const n = notes.find(x=>x.id===id);
   if(!n) return;
+  if(!ownsRecord(n)){ toast('You can edit only your own notes'); return; }
   const text = document.getElementById('nte-'+id)?.value.trim();
   if(!text){ toast('Note cannot be empty'); return; }
   n.text = text;
@@ -2575,6 +3136,7 @@ function saveNoteEdit(id){
 function toggleNotePin(id){
   const n = notes.find(x=>x.id===id);
   if(!n) return;
+  if(!ownsRecord(n)){ toast('You can edit only your own notes'); return; }
   n.pinned = !n.pinned;
   saveNotes();
   renderNotes();
@@ -2585,6 +3147,7 @@ function toggleNotePin(id){
 function deleteNote(id){
   const n = notes.find(x=>x.id===id);
   if(!n) return;
+  if(!ownsRecord(n)){ toast('You can delete only your own notes'); return; }
   customConfirm(`Delete this note?`, ()=>{
     notes = notes.filter(x=>x.id!==id);
     saveNotes();
@@ -2736,36 +3299,10 @@ async function sbDeleteTask(id){
   }catch(e){ console.warn('Supabase task delete failed',e); syncStatus('err'); }
 }
 
-// ── LOAD FROM SUPABASE ON BOOT ──
-async function loadCRM(){
-  syncStatus('syncing');
-  try{
-    // Load clients
-    const clientRows = await sbGetAll('nk_clients');
-    if(clientRows && clientRows.length){
-      crmClients = clientRows.map(r=>r.data).filter(Boolean);
-      localStorage.setItem(CRM_KEY, JSON.stringify(crmClients));
-    } else {
-      crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]');
-    }
-
-    // Load samples (stored as nk_settings rows with key 'sample_xxx')
-    const settingRows = await sbGetAll('nk_settings');
-    if(settingRows){
-      const sampleRows = settingRows.filter(r=>r.id.startsWith('sample_'));
-      crmSamples = sampleRows.map(r=>r.data).filter(Boolean);
-      localStorage.setItem('nk_samples_v1', JSON.stringify(crmSamples));
-    } else {
-      crmSamples = JSON.parse(localStorage.getItem('nk_samples_v1')||'[]');
-    }
-
-    syncStatus('ok');
-  } catch(e){
-    console.warn('Supabase load failed, falling back to localStorage', e);
-    crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]');
-    crmSamples = JSON.parse(localStorage.getItem('nk_samples_v1')||'[]');
-    syncStatus('err');
-  }
+// ── LOAD CRM — localStorage only (Supabase sync handled in background) ──
+function loadCRM(){
+  crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]');
+  crmSamples = JSON.parse(localStorage.getItem('nk_samples_v1')||'[]');
 }
 
 function crmUid(){ return 'c'+Date.now()+'_'+Math.random().toString(36).slice(2,6); }
@@ -2914,6 +3451,7 @@ function crmCardHTML(c){
           <div class="cc-status-dot ${dotCls}"></div>
           <span style="font-size:0.7rem;color:var(--ink3)">${esc(c.status?.charAt(0).toUpperCase()+c.status?.slice(1)||'')}</span>
           ${c.city?`· <span>${esc(c.city)}</span>`:''}
+          ${c.createdBy?`· <span>Added by ${esc(c.createdBy)}</span>`:''}
         </div>
       </div>
       <div class="cc-right">
@@ -3058,19 +3596,20 @@ async function crmSaveModal(){
   const data = {};
   fields.forEach(f=>{ data[f] = document.getElementById('cm_'+f)?.value||''; });
   data.name = name;
+  const wasEdit = !!crmEditId;
 
   if(crmEditId){
     const idx = crmClients.findIndex(c=>c.id===crmEditId);
     if(idx>-1){ crmClients[idx] = {...crmClients[idx], ...data}; await sbSaveClient(crmClients[idx]); }
   } else {
-    const newClient = { id:crmUid(), ...data, history:[], createdAt:Date.now() };
+    const newClient = { id:crmUid(), ...data, history:[], createdAt:Date.now(), createdBy:actorName(), createdById:actorId() };
     crmClients.unshift(newClient);
     await sbSaveClient(newClient);
   }
   crmRender();
   document.getElementById('crmModalOverlay').classList.remove('open');
   crmEditId = null;
-  toast(crmEditId?'Client updated ✓':'Client added ✓');
+  toast(wasEdit ? 'Client updated ✓' : 'Client added ✓');
 }
 
 // ══════════════════════════════════════
@@ -3229,6 +3768,676 @@ async function saveSampleModal(){
   closeSampleModal();
   crmRender();
   toast('Sample request logged ✓');
+}
+
+// ══════════════════════════════════════
+// APPROVAL WORKFLOW — COMPLETE
+// ══════════════════════════════════════
+function staffMarkDone(id){
+  var t=tasks.find(function(x){return x.id===id;});
+  if(!t) return;
+  if(isStaff() && t.assignee!==actorName() && t.createdById!==actorId()){ toast('You can mark only your own tasks'); return; }
+  t.pendingApproval=true;
+  t.pendingBy=currentUser.name;
+  t.pendingAt=Date.now();
+  persist();
+  // Sync to Supabase so admin sees it
+  if(typeof sbSaveTask==='function') sbSaveTask(t).catch(function(){});
+  render();
+  toast('Marked done ✓ — waiting for admin approval');
+}
+
+function adminApprove(id){
+  if(!isAdmin()){ toast('Admin access only'); return; }
+  var t=tasks.find(function(x){return x.id===id;});
+  if(!t) return;
+  t.done=true;
+  t.pendingApproval=false;
+  t.approvedBy=currentUser.name;
+  t.approvedAt=Date.now();
+  persist();
+  if(typeof sbSaveTask==='function') sbSaveTask(t).catch(function(){});
+  render();
+  toast('Task approved ✓');
+}
+
+// ══════════════════════════════════════
+// PASSWORD MANAGEMENT (admin panel)
+// ══════════════════════════════════════
+function buildPassMgmt(){
+  // Only visible to admin
+  var section=document.getElementById('passSection');
+  if(!section) return;
+  if(!currentUser||currentUser.role!=='admin'){ section.style.display='none'; return; }
+  section.style.display='';
+
+  var passes=getPasses();
+  var members=[{id:'__admin__',name:'Aryan (Admin)'}];
+  (people||[]).filter(function(p){return p.status==='active';}).forEach(function(p){
+    members.push({id:p.id,name:p.name});
+  });
+
+  var html=members.map(function(m){
+    var hasPass=!!passes[m.id];
+    return '<div class="pass-mgmt-row">'+
+      '<div><div class="pass-mgmt-name">'+m.name+'</div>'+
+      '<div class="pass-mgmt-status">'+(hasPass?'Password set':'No password yet')+'</div></div>'+
+      '<button class="pass-reset-btn" onclick="adminResetPass(\''+m.id+'\',\''+m.name+'\')">Reset</button>'+
+      '</div>';
+  }).join('');
+  var el=document.getElementById('passMgmtList');
+  if(el) el.innerHTML=html;
+}
+
+function adminResetPass(id,name){
+  var newPass=prompt('Set new password for '+name+' (min 4 chars):');
+  if(!newPass) return;
+  if(newPass.length<4){ toast('Password too short'); return; }
+  var passes=getPasses();
+  passes[id]=hashPass(newPass);
+  savePasses(passes);
+  toast('Password updated for '+name+' ✓');
+  buildPassMgmt();
+}
+
+// Hook settings tab to build password section — merged into switchTab below
+
+// Patch enterApp — merged: show login/app shell + render + passSection
+// (defined below near initAuth — single definition, no patching needed)
+
+
+
+// ══════════════════════════════════════
+// CHECKLIST — parties/reminders visible to the team, with owner labels
+function chkRender(){
+  chkBuildFilters();
+  var el=document.getElementById('chkList');
+  if(!el) return;
+
+  var list=chkItems.filter(function(item){
+    if(chkFilter==='pending' && item.done) return false;
+    if(chkFilter==='done' && !item.done) return false;
+    if(chkFilter!=='all'&&chkFilter!=='pending'&&chkFilter!=='done'&&item.assignee!==chkFilter) return false;
+    return true;
+  });
+
+  if(!list.length){
+    el.innerHTML='<div class="chk-empty"><div class="chk-empty-icon">— Clear —</div><p>No party reminders here.</p></div>';
+    return;
+  }
+
+  var pending=list.filter(function(x){return !x.done;});
+  var done=list.filter(function(x){return x.done;});
+  var html='';
+
+  function secDiv(lbl){ return '<div class="chk-sec"><div class="chk-sec-line"></div><div class="chk-sec-lbl">'+lbl+'</div><div class="chk-sec-line"></div></div>'; }
+
+  function itemHTML(item){
+    var aTag=item.assignee?'<span class="chk-tag" style="background:var(--bg-blue);color:var(--c-blue);border-color:var(--bd-blue);">→ '+item.assignee+'</span>':'';
+    var noteTag=item.note?'<span class="chk-tag" style="background:var(--cream2);color:var(--ink3);border-color:var(--rule2);">'+item.note+'</span>':'';
+    var byTag=item.createdBy?'<span class="chk-tag" style="background:var(--bg-slate);color:var(--c-slate);border-color:var(--bd-slate);">Added by '+item.createdBy+'</span>':'';
+    var delBtn=ownsRecord(item)?'<button class="chk-del" onclick="chkDelete(\''+item.id+'\')" title="Remove">×</button>':'';
+    return '<div class="chk-item '+(item.done?'chk-done':'')+'">'+
+      '<div class="chk-cb '+(item.done?'ck':'')+'" onclick="chkToggle(\''+item.id+'\')"></div>'+
+      '<div class="chk-info">'+
+        '<div class="chk-name">'+item.name+'</div>'+
+        '<div class="chk-meta-row">'+aTag+noteTag+byTag+'</div>'+
+      '</div>'+
+      delBtn+
+    '</div>';
+  }
+
+  if(pending.length){ html+=secDiv('Pending · '+pending.length); pending.forEach(function(i){html+=itemHTML(i);}); }
+  if(done.length)   { html+=secDiv('Done · '+done.length);    done.forEach(function(i){html+=itemHTML(i);}); }
+  el.innerHTML=html;
+}
+
+// ══════════════════════════════════════
+// ADMIN STATS — pending approvals count merged into updateCounts below
+// ══════════════════════════════════════
+
+
+// boot() called at end of file
+var AUTH_KEY = 'nk_auth_passes'; // {id: hashedPass}
+var SESSION_KEY = 'nk_session';  // sessionStorage
+
+var currentUser = null; // {id, name, role:'admin'|'staff'}
+
+function hashPass(p){ var h=0; for(var i=0;i<p.length;i++){h=Math.imul(31,h)+p.charCodeAt(i)|0;} return h.toString(36); }
+
+function getPasses(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'{}'); }catch(e){return{};} }
+function savePasses(obj){ localStorage.setItem(AUTH_KEY,JSON.stringify(obj)); }
+
+function buildLoginSelects(){
+  var opts = '<option value="">— Select —</option><option value="__admin__">Admin (Aryan)</option>';
+  (people||[]).forEach(function(p){
+    if(p.status==='active') opts += '<option value="'+p.id+'">'+p.name+'</option>';
+  });
+  var ln=document.getElementById('loginName');
+  var sn=document.getElementById('spName');
+  if(ln) ln.innerHTML=opts;
+  if(sn) sn.innerHTML=opts;
+}
+
+function showLogin(){
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('setPassScreen').style.display='none';
+  document.getElementById('loginErr').textContent='';
+  buildLoginSelects();
+}
+function showSetPassword(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('setPassScreen').style.display='flex';
+  document.getElementById('spErr').textContent='';
+  buildLoginSelects();
+}
+
+function doLogin(){
+  var idVal = document.getElementById('loginName').value;
+  var pass  = document.getElementById('loginPass').value;
+  var err   = document.getElementById('loginErr');
+  if(!idVal){ err.textContent='Please select your name.'; return; }
+  if(!pass)  { err.textContent='Please enter your password.'; return; }
+
+  var passes = getPasses();
+  var stored = passes[idVal];
+  if(!stored){ err.textContent='No password set yet. Set one first.'; return; }
+  if(stored !== hashPass(pass)){ err.textContent='Incorrect password.'; return; }
+
+  // Determine role
+  var role = idVal==='__admin__' ? 'admin' : 'staff';
+  var name = idVal==='__admin__' ? 'Aryan (Admin)' : ((people||[]).find(function(p){return p.id===idVal;})||{}).name||idVal;
+  currentUser = {id:idVal, name:name, role:role};
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+  enterApp();
+}
+
+function doSetPassword(){
+  var idVal = document.getElementById('spName').value;
+  var p1    = document.getElementById('spPass1').value;
+  var p2    = document.getElementById('spPass2').value;
+  var err   = document.getElementById('spErr');
+  if(!idVal){ err.textContent='Select your name.'; return; }
+  if(!p1||p1.length<4){ err.textContent='Password must be at least 4 characters.'; return; }
+  if(p1!==p2){ err.textContent='Passwords do not match.'; return; }
+
+  var passes = getPasses();
+  // Only admin can set admin password; staff can only set their own if not already set OR if admin
+  if(idVal==='__admin__' && passes['__admin__'] && !(currentUser&&currentUser.role==='admin')){
+    err.textContent='Admin password already set. Contact admin to reset.'; return;
+  }
+  passes[idVal] = hashPass(p1);
+  savePasses(passes);
+  err.style.color='var(--c-green)';
+  err.textContent='Password saved! You can now sign in.';
+  setTimeout(function(){ err.style.color=''; showLogin(); }, 1500);
+}
+
+function doLogout(){
+  sessionStorage.removeItem(SESSION_KEY);
+  currentUser=null;
+  document.body.classList.remove('is-admin','is-staff');
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('staffBanner').style.display='none';
+  document.getElementById('loginPass').value='';
+  showLogin();
+}
+
+function enterApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('setPassScreen').style.display='none';
+  document.getElementById('appShell').style.display='';
+  document.body.classList.toggle('is-admin', currentUser.role==='admin');
+  document.body.classList.toggle('is-staff', currentUser.role==='staff');
+  buildAddMeta();
+  chkBuildAssignee();
+  if(currentUser.role==='staff'){
+    document.getElementById('staffBanner').style.display='flex';
+    document.getElementById('staffBannerTxt').textContent='Signed in as '+currentUser.name+' — you see only your assigned tasks';
+  } else {
+    document.getElementById('staffBanner').style.display='none';
+  }
+  if(currentUser.role==='staff' && (currentTab==='settings'||currentTab==='admin')) currentTab='today';
+  switchTab(currentTab||'today');
+  render();
+  buildPassMgmt();
+}
+
+function initAuth(){
+  // Restore session if exists
+  try{
+    var sess = sessionStorage.getItem(SESSION_KEY);
+    if(sess){
+      currentUser = JSON.parse(sess);
+      enterApp();
+      return;
+    }
+  }catch(e){}
+  // Check if admin pass is set; if not, go straight to set-password
+  var passes = getPasses();
+  if(!passes['__admin__']){
+    showSetPassword();
+  } else {
+    showLogin();
+  }
+}
+
+// (staffMarkDone, adminApprove, switchTab defined above with full implementations)
+
+// ══════════════════════════════════════
+// AUTH — LOGIN / SESSION
+// ══════════════════════════════════════
+
+// ══════════════════════════════════════
+// QUICK PARTY CHECKLIST
+// ══════════════════════════════════════
+var CHK_KEY = 'nk_checklist_v1';
+var chkItems = [];
+var chkFilter = 'all';
+
+function chkLoad(){ try{ chkItems=JSON.parse(localStorage.getItem(CHK_KEY)||'[]')||[]; }catch(e){ chkItems=[]; } }
+function chkSave(){ localStorage.setItem(CHK_KEY, JSON.stringify(chkItems)); }
+
+function chkBuildAssignee(){
+  var el=document.getElementById('chkAssignee');
+  if(!el) return;
+  var opts='<option value="">Anyone</option><option value="Self">Self</option>';
+  (people||[]).filter(function(p){return p.status==='active';}).forEach(function(p){
+    opts+='<option value="'+p.name+'">'+p.name+'</option>';
+  });
+  el.innerHTML=opts;
+}
+
+function chkBuildFilters(){
+  var el=document.getElementById('chkFilters');
+  if(!el) return;
+  var filters=['all','pending','done'];
+  var labels={all:'All',pending:'Pending',done:'Done'};
+  el.innerHTML=filters.map(function(f){
+    return '<div class="chk-fc '+(chkFilter===f?'on':'')+'" onclick="chkSetFilter(\''+f+'\')">'+(labels[f])+'</div>';
+  }).join('');
+  // Also build assignee filters from active people
+  (people||[]).filter(function(p){return p.status==='active';}).forEach(function(p){
+    el.innerHTML+='<div class="chk-fc '+(chkFilter===p.name?'on':'')+'" onclick="chkSetFilter(\''+p.name+'\')" >'+p.name+'</div>';
+  });
+}
+
+function chkSetFilter(f){ chkFilter=f; chkRender(); }
+
+function chkAdd(){
+  var name=(document.getElementById('chkInput')||{}).value;
+  if(name) name=name.trim(); else name='';
+  if(!name){ toast('Enter a party name'); return; }
+  var assignee=(document.getElementById('chkAssignee')||{}).value||'';
+  var note=(document.getElementById('chkNote')||{}).value||''; if(note) note=note.trim();
+  chkItems.unshift({id:'c'+Date.now().toString(36), name:name, assignee:assignee, note:note, done:false, ts:Date.now(), createdBy:actorName(), createdById:actorId()});
+  chkSave();
+  document.getElementById('chkInput').value='';
+  document.getElementById('chkNote').value='';
+  chkRender();
+  toast('Added ✓');
+}
+
+function chkToggle(id){
+  var item=chkItems.find(function(x){return x.id===id;});
+  if(!item) return;
+  item.done=!item.done;
+  chkSave();
+  chkRender();
+}
+
+function chkDelete(id){
+  var item=chkItems.find(function(x){return x.id===id;});
+  if(item&&!ownsRecord(item)){ toast('You can delete only your own reminder'); return; }
+  chkItems=chkItems.filter(function(x){return x.id!==id;});
+  chkSave();
+  chkRender();
+}
+
+// old chkRender removed — staff-aware version defined above
+
+// ══════════════════════════════════════
+// PAYMENTS MODULE
+// ══════════════════════════════════════
+const PAY_KEY = 'nk_payments_v1';
+let payEntries = [];
+let payFilter  = 'all';
+let payEditId  = null;
+
+function payLoad(){
+  try{ payEntries = JSON.parse(localStorage.getItem(PAY_KEY)||'[]')||[]; }catch(e){ payEntries=[]; }
+}
+function paySave(){
+  localStorage.setItem(PAY_KEY, JSON.stringify(payEntries));
+  // Sync each entry to Supabase (fire-and-forget)
+  payEntries.forEach(e=>sbUpsert('nk_settings','pay_'+e.id,e).catch(()=>{}));
+}
+
+function payUid(){ return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+
+function fmtAmount(n){
+  if(!n) return '';
+  const num = parseFloat(n);
+  if(isNaN(num)) return '';
+  if(num>=100000) return '₹'+(num/100000).toFixed(num%100000===0?0:1)+'L';
+  if(num>=1000)   return '₹'+(num/1000).toFixed(num%1000===0?0:1)+'K';
+  return '₹'+num.toLocaleString('en-IN');
+}
+
+function payNextBadge(e){
+  if(!e.nextDate) return {cls:'pnb-none',txt:'No follow-up set'};
+  const today = todayStr();
+  if(e.nextDate < today) return {cls:'pnb-overdue',txt:'⚠ Overdue: '+fmtDate(e.nextDate)};
+  const d = Math.round((new Date(e.nextDate)-new Date(today))/86400000);
+  if(d<=3) return {cls:'pnb-due',txt:'Follow-up in '+d+'d'};
+  return {cls:'pnb-ok',txt:'Next: '+fmtDate(e.nextDate)};
+}
+
+const PAY_STATUS_MAP = {
+  pending:'⏳ Pending', called:'📞 Called', visited:'🚗 Visited',
+  follow_up:'🔁 Follow-up', received:'✅ Received'
+};
+const PAY_STATUS_CSS = {
+  pending:'psb-pending', called:'psb-called', visited:'psb-visited',
+  follow_up:'psb-follow_up', received:'psb-received'
+};
+const PAY_LOG_ICONS = {
+  call:'📞', visit:'🚗', whatsapp:'💬', note:'📝', partial:'💵', received:'✅'
+};
+
+function paySetFilter(el, f){
+  payFilter = f;
+  document.querySelectorAll('.pay-chip').forEach(c=>{
+    c.className='pay-chip';
+    if(c.dataset.pf===f) c.classList.add('pay-ca');
+  });
+  payRender();
+}
+
+function payRender(){
+  const q = (document.getElementById('paySearch')?.value||'').toLowerCase();
+  const today = todayStr();
+
+  let list = payEntries.filter(e=>{
+    if(payFilter==='pending'  && e.status!=='pending')  return false;
+    if(payFilter==='called'   && e.status!=='called')   return false;
+    if(payFilter==='visited'  && e.status!=='visited')  return false;
+    if(payFilter==='received' && e.status!=='received') return false;
+    if(payFilter==='follow_up'){
+      if(!e.nextDate || e.nextDate > today) return false;
+      if(e.status==='received') return false;
+    }
+    if(q){
+      const hay=[e.firm,e.contact,e.assignee,e.notes].join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  // Sort: received last, then by nextDate overdue first, then by amount desc
+  list.sort((a,b)=>{
+    if(a.status==='received'&&b.status!=='received') return 1;
+    if(b.status==='received'&&a.status!=='received') return -1;
+    const aOver = a.nextDate && a.nextDate<today;
+    const bOver = b.nextDate && b.nextDate<today;
+    if(aOver&&!bOver) return -1;
+    if(bOver&&!aOver) return 1;
+    const pa = {'high':0,'medium':1,'low':2}[a.priority]??1;
+    const pb = {'high':0,'medium':1,'low':2}[b.priority]??1;
+    if(pa!==pb) return pa-pb;
+    return (parseFloat(b.amount)||0)-(parseFloat(a.amount)||0);
+  });
+
+  // Stats
+  const all = payEntries.filter(e=>e.status!=='received');
+  const followupDue = payEntries.filter(e=>e.status!=='received'&&e.nextDate&&e.nextDate<=today).length;
+  const received = payEntries.filter(e=>e.status==='received').length;
+  const outstanding = all.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  document.getElementById('pst-total').textContent = payEntries.length;
+  document.getElementById('pst-pending').textContent = all.length;
+  document.getElementById('pst-followup').textContent = followupDue;
+  document.getElementById('pst-received').textContent = received;
+  document.getElementById('pst-amount').textContent = fmtAmount(outstanding)||'₹0';
+
+  const el = document.getElementById('payList');
+  if(!list.length){
+    el.innerHTML=`<div class="pay-empty"><div class="pay-empty-icon">— Clear —</div><p>${payFilter==='all'?'No payment entries yet. Add one to start tracking outstanding amounts.':'No entries match this filter.'}</p></div>`;
+    return;
+  }
+  el.innerHTML = list.map(e=>payCardHTML(e)).join('');
+}
+
+function payCardHTML(e){
+  const nb = payNextBadge(e);
+  const logs = (e.logs||[]);
+  const initials = (e.firm||'?').slice(0,2).toUpperCase();
+  const statusCss = PAY_STATUS_CSS[e.status]||'psb-pending';
+  const statusLbl = PAY_STATUS_MAP[e.status]||e.status;
+  const amtOverdue = e.dueDate && e.dueDate<todayStr() && e.status!=='received';
+
+  let logHtml = '';
+  if(logs.length){
+    logHtml = [...logs].reverse().map(l=>`
+      <div class="pli">
+        <div class="pli-icon">${PAY_LOG_ICONS[l.type]||'📝'}</div>
+        <div class="pli-body">
+          <div class="pli-action">${esc(l.typeLabel||l.type)}</div>
+          <div class="pli-meta">${l.date||''}${l.by?' · by '+esc(l.by):''}</div>
+          ${l.note?`<div class="pli-note">${esc(l.note)}</div>`:''}
+        </div>
+      </div>`).join('');
+  } else {
+    logHtml = '<div style="font-size:0.78rem;color:var(--ink4);padding:4px 0;">No activity logged yet.</div>';
+  }
+
+  const isCalled  = e.status==='called';
+  const isVisited = e.status==='visited';
+  const isRecv    = e.status==='received';
+
+  return `<div class="pc pc-${e.priority||'medium'} ${isRecv?'pc-received':''}" id="pc-${e.id}">
+    <div class="pc-main">
+      <div class="pc-avatar">${initials}</div>
+      <div class="pc-info">
+        <div class="pc-firm">${esc(e.firm)}</div>
+        <div class="pc-sub">
+          ${e.contact?`<span>👤 ${esc(e.contact)}</span>`:''}
+          ${e.assignee?`<span style="background:var(--bg-blue);color:var(--c-blue);border:1px solid var(--bd-blue);border-radius:4px;padding:1px 6px;font-size:0.62rem;font-weight:600;">→ ${esc(e.assignee)}</span>`:''}
+          ${e.dueDate?`<span>📅 Due ${fmtDate(e.dueDate)}</span>`:''}
+          ${e.createdBy?`<span>Added by ${esc(e.createdBy)}</span>`:''}
+        </div>
+      </div>
+      <div class="pc-right">
+        ${e.amount?`<div class="pc-amount ${amtOverdue?'overdue':''}">${fmtAmount(e.amount)}</div>`:''}
+        <div class="pc-status-badge ${statusCss}">${statusLbl}</div>
+        <div class="pc-next-badge ${nb.cls}">${nb.txt}</div>
+      </div>
+    </div>
+    <div class="pc-actions">
+      <button class="pc-btn pb-call ${isCalled?'btn-active':''}" onclick="payQuickAction('${e.id}','call')" title="Log a call">📞 Called</button>
+      <button class="pc-btn pb-visit ${isVisited?'btn-active-blue':''}" onclick="payQuickAction('${e.id}','visit')" title="Log a visit">🚗 Visited</button>
+      <button class="pc-btn" onclick="payQuickAction('${e.id}','follow_up')" title="Set next follow-up">🔁 Follow-up</button>
+      <button class="pc-btn pb-recv ${isRecv?'btn-active':''}" onclick="payQuickAction('${e.id}','received')" title="Mark payment received">✅ Received</button>
+      <button class="pc-btn pb-edit" onclick="payOpenModal('${e.id}')">✎ Edit</button>
+      <button class="pc-btn pb-del" onclick="payDelete('${e.id}')">✕</button>
+    </div>
+    <button class="pc-log-btn" onclick="payToggleLog('${e.id}')">
+      <span id="plb-arrow-${e.id}">▸</span> Activity Log (${logs.length})
+    </button>
+    <div class="pc-log-panel" id="plp-${e.id}">
+      <div class="pc-log-list">${logHtml}</div>
+      <div class="pc-quick-log">
+        <div class="pcql-row">
+          <select class="pcql-sel" id="plqs-${e.id}">
+            <option value="call">📞 Called</option>
+            <option value="visit">🚗 Visited</option>
+            <option value="whatsapp">💬 WhatsApp</option>
+            <option value="partial">💵 Partial Payment</option>
+            <option value="received">✅ Payment Received</option>
+            <option value="note">📝 Note</option>
+          </select>
+          <input class="pcql-date" type="date" id="plqd-${e.id}" value="${todayStr()}"/>
+          <input class="pcql-date" type="date" id="plqn-${e.id}" placeholder="Next follow-up" style="color:var(--ink4);"/>
+        </div>
+        <textarea class="pcql-inp" id="plqi-${e.id}" rows="2" placeholder="Notes, amount, what was discussed…"></textarea>
+        <div style="display:flex;gap:8px;align-items:center;font-size:0.7rem;color:var(--ink3);">
+          <button class="pcql-save" onclick="payLogEntry('${e.id}')">Log Activity</button>
+          <span>Set next follow-up date above (optional)</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function payToggleLog(id){
+  const panel = document.getElementById('plp-'+id);
+  const arrow = document.getElementById('plb-arrow-'+id);
+  if(!panel) return;
+  const open = panel.classList.toggle('open');
+  if(arrow) arrow.textContent = open?'▾':'▸';
+}
+
+function payQuickAction(id, action){
+  const e = payEntries.find(x=>x.id===id);
+  if(!e) return;
+
+  if(action==='call'){
+    e.status = e.status==='called'?'pending':'called';
+    if(e.status==='called'){
+      if(!e.logs) e.logs=[];
+      e.logs.push({id:payUid(),type:'call',typeLabel:'📞 Called',date:todayStr(),by:currentUser?.name||'',note:'',ts:Date.now()});
+    }
+  } else if(action==='visit'){
+    e.status = e.status==='visited'?'pending':'visited';
+    if(e.status==='visited'){
+      if(!e.logs) e.logs=[];
+      e.logs.push({id:payUid(),type:'visit',typeLabel:'🚗 Visited',date:todayStr(),by:currentUser?.name||'',note:'',ts:Date.now()});
+    }
+  } else if(action==='follow_up'){
+    // Open log panel and focus on next-date input
+    const panel = document.getElementById('plp-'+id);
+    if(panel&&!panel.classList.contains('open')) payToggleLog(id);
+    const nd = document.getElementById('plqn-'+id);
+    const sel = document.getElementById('plqs-'+id);
+    if(sel) sel.value='call';
+    setTimeout(()=>{ if(nd) nd.focus(); }, 300);
+    return;
+  } else if(action==='received'){
+    e.status = e.status==='received'?'pending':'received';
+    if(e.status==='received'){
+      if(!e.logs) e.logs=[];
+      e.logs.push({id:payUid(),type:'received',typeLabel:'✅ Payment Received',date:todayStr(),by:currentUser?.name||'',note:'',ts:Date.now()});
+    }
+  }
+  paySave();
+  payRender();
+  toast(action==='call'?'Logged: Called 📞':action==='visit'?'Logged: Visited 🚗':action==='received'?'Payment received ✅':'Updated');
+}
+
+function payLogEntry(id){
+  const e = payEntries.find(x=>x.id===id);
+  if(!e) return;
+  const type = document.getElementById('plqs-'+id)?.value||'note';
+  const note = document.getElementById('plqi-'+id)?.value.trim()||'';
+  const date = document.getElementById('plqd-'+id)?.value||todayStr();
+  const nextDate = document.getElementById('plqn-'+id)?.value||'';
+
+  if(!e.logs) e.logs=[];
+  const typeLabels={call:'📞 Called',visit:'🚗 Visited',whatsapp:'💬 WhatsApp',partial:'💵 Partial Payment',received:'✅ Payment Received',note:'📝 Note'};
+  e.logs.push({id:payUid(),type,typeLabel:typeLabels[type]||type,date,by:currentUser?.name||'',note,ts:Date.now()});
+
+  // Update status based on type
+  if(type==='received') e.status='received';
+  else if(type==='call') e.status='called';
+  else if(type==='visit') e.status='visited';
+  else if(type==='partial') e.status='called';
+
+  if(nextDate) e.nextDate=nextDate;
+
+  paySave();
+  payRender();
+  setTimeout(()=>payToggleLog(id), 50);
+  toast('Activity logged ✓');
+}
+
+function payDelete(id){
+  const e = payEntries.find(x=>x.id===id);
+  if(!e) return;
+  customConfirm(`Delete payment entry for <strong>${esc(e.firm)}</strong>?`, ()=>{
+    payEntries = payEntries.filter(x=>x.id!==id);
+    sbDelete('nk_settings','pay_'+id).catch(()=>{});
+    paySave();
+    payRender();
+    toast('Entry deleted');
+  });
+}
+
+function payOpenModal(id){
+  payEditId = id||null;
+  const title = document.getElementById('payModalTitle');
+
+  // Build assignee options
+  const aopts = ['<option value="">— Unassigned —</option>','<option value="Self">Self</option>',
+    ...(people||[]).filter(p=>p.status==='active').map(p=>`<option value="${p.name}">${p.name}</option>`)].join('');
+  document.getElementById('pm_assignee').innerHTML=aopts;
+
+  if(id){
+    const e = payEntries.find(x=>x.id===id);
+    if(!e) return;
+    title.textContent='Edit Payment Entry';
+    document.getElementById('pm_firm').value = e.firm||'';
+    document.getElementById('pm_amount').value = e.amount||'';
+    document.getElementById('pm_contact').value = e.contact||'';
+    document.getElementById('pm_assignee').value = e.assignee||'';
+    document.getElementById('pm_priority').value = e.priority||'medium';
+    document.getElementById('pm_dueDate').value = e.dueDate||'';
+    document.getElementById('pm_nextDate').value = e.nextDate||'';
+    document.getElementById('pm_notes').value = e.notes||'';
+  } else {
+    title.textContent='Add Payment Entry';
+    document.getElementById('pm_firm').value='';
+    document.getElementById('pm_amount').value='';
+    document.getElementById('pm_contact').value='';
+    document.getElementById('pm_assignee').value='';
+    document.getElementById('pm_priority').value='medium';
+    document.getElementById('pm_dueDate').value='';
+    document.getElementById('pm_nextDate').value='';
+    document.getElementById('pm_notes').value='';
+  }
+  document.getElementById('payModalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('pm_firm').focus(),100);
+}
+
+function payCloseModal(e){
+  if(e&&e.target!==document.getElementById('payModalOverlay')) return;
+  document.getElementById('payModalOverlay').classList.remove('open');
+  payEditId=null;
+}
+
+function paySaveModal(){
+  const firm = document.getElementById('pm_firm').value.trim();
+  if(!firm){toast('Firm name is required');return;}
+  const wasEdit = !!payEditId;
+  const data = {
+    firm,
+    amount:   document.getElementById('pm_amount').value,
+    contact:  document.getElementById('pm_contact').value.trim(),
+    assignee: document.getElementById('pm_assignee').value,
+    priority: document.getElementById('pm_priority').value||'medium',
+    dueDate:  document.getElementById('pm_dueDate').value,
+    nextDate: document.getElementById('pm_nextDate').value,
+    notes:    document.getElementById('pm_notes').value.trim(),
+  };
+  if(wasEdit){
+    const idx = payEntries.findIndex(x=>x.id===payEditId);
+    if(idx>-1) Object.assign(payEntries[idx],data);
+  } else {
+    payEntries.unshift({id:payUid(),status:'pending',logs:[],createdAt:Date.now(),createdBy:actorName(),createdById:actorId(),...data});
+  }
+  paySave();
+  payRender();
+  document.getElementById('payModalOverlay').classList.remove('open');
+  payEditId=null;
+  toast(wasEdit?'Entry updated ✓':'Entry added ✓');
 }
 
 boot();
