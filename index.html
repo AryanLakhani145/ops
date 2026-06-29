@@ -15,8 +15,6 @@ const SB_URL = 'https://lwaqwxsvgdghekzmanvy.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3YXF3eHN2Z2RnaGVrem1hbnZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MzI0ODMsImV4cCI6MjA5MTMwODQ4M30.ri3WwF1-bSNHV7LKmkRhjamq3DoZmGDV7L_d1vYyos4';
 
 async function sbFetch(path, opts={}){
-  // Skip entirely when running from file:// — CORS will block it anyway
-  if(location.protocol === 'file:') return null;
   const { prefer, headers: extraHeaders, body, method='GET', ...restOpts } = opts;
   const fetchOpts = {
     method,
@@ -2196,7 +2194,8 @@ async function boot(){
   initNotes();
   renderNotes();
   initDarkMode();
-  initAuth();
+  // Pull passwords from cloud before showing login — so any device is in sync
+  loadPassesFromCloud().catch(function(){}).finally(function(){ initAuth(); });
 
   // 4. Load CRM from localStorage
   crmClients = JSON.parse(localStorage.getItem(CRM_KEY)||'[]');
@@ -2206,9 +2205,7 @@ async function boot(){
   syncStatus('ok');
 
   // 5. Try Supabase sync silently in background — never blocks or breaks the app
-  if(location.protocol !== 'file:'){
-    _syncFromSupabase();
-  }
+  _syncFromSupabase();
 }
 
 async function _syncFromSupabase(){
@@ -4094,18 +4091,14 @@ function hashPass(p){ var h=0; for(var i=0;i<p.length;i++){h=Math.imul(31,h)+p.c
 
 function getPasses(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'{}'); }catch(e){return{};} }
 
-// Saves locally immediately, then pushes to the cloud. Returns a promise that
-// resolves true if the cloud write succeeded, false otherwise — callers can
-// surface an honest "synced / saved locally only" message.
+// Saves locally immediately, then pushes to the cloud.
+// Always tries Supabase — even from file:// Safari it will attempt the push.
+// If it fails (CORS on file://, no internet, etc.) it silently falls back to local only.
 function savePasses(obj){
   localStorage.setItem(AUTH_KEY, JSON.stringify(obj));
-  if(location.protocol === 'file:'){
-    // Opened as a local file — Supabase is unreachable, so devices can't share.
-    return Promise.resolve(false);
-  }
   return sbUpsert('nk_settings', 'auth_passes', obj)
     .then(function(){ return true; })
-    .catch(function(e){ console.warn('Password sync failed:', e); return false; });
+    .catch(function(e){ console.warn('Password sync failed (saved locally):', e); return false; });
 }
 
 async function loadPassesFromCloud(){
@@ -4159,19 +4152,17 @@ async function doLogin(){
 
   var passes = getPasses();
   var stored = passes[idVal];
-  // Not found locally? Pull the latest from the cloud before giving up — covers
-  // the case where the password was set on another device after this one booted.
-  if(!stored && location.protocol !== 'file:'){
-    err.style.color=''; err.textContent='Checking…';
+  // Always pull from cloud first — works from file://, Safari, Chrome, any device.
+  // If Supabase is unreachable it silently falls through to local.
+  if(!stored){
+    err.textContent='Checking…';
     await loadPassesFromCloud();
     passes = getPasses();
     stored = passes[idVal];
     err.textContent='';
   }
   if(!stored){
-    err.textContent = location.protocol === 'file:'
-      ? 'No password set on this device. (Open the hosted link, not the file, to share passwords across devices.)'
-      : 'No password set yet. Tap “Set up your password” below.';
+    err.textContent = 'No password set yet. Tap “Set up your password” below.';
     return;
   }
   if(stored !== hashPass(pass)){ err.textContent='Incorrect password.'; return; }
@@ -4196,11 +4187,9 @@ async function doSetPassword(){
 
   // Pull the freshest passwords first so we don't clobber a password another
   // device just set, and so the "already set" guard below is accurate.
-  if(location.protocol !== 'file:'){
-    err.textContent='Saving…';
-    await loadPassesFromCloud();
-    err.textContent='';
-  }
+  err.textContent='Saving…';
+  await loadPassesFromCloud();
+  err.textContent='';
   var passes = getPasses();
   // Only admin can set admin password; staff can only set their own if not already set OR if admin
   if(idVal==='__admin__' && passes['__admin__'] && !(currentUser&&currentUser.role==='admin')){
