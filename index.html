@@ -1299,14 +1299,14 @@ body.is-staff .staff-lock-assignee{opacity:.55;pointer-events:none;}
     <button class="tab-btn" onclick="switchTab('crm')">
       <span class="tab-icon">🤝</span> Clients
     </button>
+    <button class="tab-btn" onclick="switchTab('payments')">
+      <span class="tab-icon">💰</span> Payments
+    </button>
     <button class="tab-btn admin-only" onclick="switchTab('admin')">
       <span class="tab-icon">🛡</span> Admin
     </button>
     <button class="tab-btn admin-only" onclick="switchTab('settings')">
       <span class="tab-icon">⚙</span> Settings
-    </button>
-    <button class="tab-btn" onclick="switchTab('payments')">
-      <span class="tab-icon">💰</span> Payments
     </button>
   </div>
 </header>
@@ -2131,12 +2131,17 @@ async function _syncFromSupabase(){
       crmClients = clientRows.map(r=>r.data).filter(Boolean);
       localStorage.setItem(CRM_KEY, JSON.stringify(crmClients));
     }
+    // Pull from dedicated tables
+    const sampleRows = await sbGetAll('nk_samples');
+    if(sampleRows && sampleRows.length){ crmSamples = sampleRows.map(r=>r.data).filter(Boolean); localStorage.setItem('nk_samples_v1',JSON.stringify(crmSamples)); }
+    const payRows = await sbGetAll('nk_payments');
+    if(payRows && payRows.length){ payEntries = payRows.map(r=>r.data).filter(Boolean); localStorage.setItem(PAY_KEY,JSON.stringify(payEntries)); }
+    const partyRows = await sbGetAll('nk_parties');
+    if(partyRows && partyRows.length){ chkItems = partyRows.map(r=>r.data).filter(Boolean); localStorage.setItem(CHK_KEY,JSON.stringify(chkItems)); }
+    // nk_settings still used for auth, meta, settings
     const settingRows = await sbGetAll('nk_settings');
     if(settingRows){
-      const sampleRows = settingRows.filter(r=>r.id.startsWith('sample_'));
-      if(sampleRows.length){ crmSamples = sampleRows.map(r=>r.data).filter(Boolean); localStorage.setItem('nk_samples_v1',JSON.stringify(crmSamples)); }
-      const payRows = settingRows.filter(r=>r.id.startsWith('pay_'));
-      if(payRows.length){ payEntries = payRows.map(r=>r.data).filter(Boolean); localStorage.setItem(PAY_KEY,JSON.stringify(payEntries)); }
+      // any remaining legacy pay_/sample_ rows are ignored now
     }
     rebuildAll(); render(); renderNotes(); crmRender(); chkRender(); payRender();
     syncStatus('ok');
@@ -3244,7 +3249,7 @@ async function sbDeleteClient(id){
 async function sbSaveSample(s){
   try{
     syncStatus('syncing');
-    await sbUpsert('nk_settings', 'sample_'+s.id, s);
+    await sbUpsert('nk_samples', s.id, s);
     syncStatus('ok');
   }catch(e){ console.warn('Supabase sample save failed',e); syncStatus('err'); }
   localStorage.setItem('nk_samples_v1', JSON.stringify(crmSamples));
@@ -3253,7 +3258,7 @@ async function sbSaveSample(s){
 async function sbDeleteSample(id){
   try{
     syncStatus('syncing');
-    await sbDelete('nk_settings', 'sample_'+id);
+    await sbDelete('nk_samples', id);
     syncStatus('ok');
   }catch(e){ console.warn('Supabase sample delete failed',e); syncStatus('err'); }
   localStorage.setItem('nk_samples_v1', JSON.stringify(crmSamples));
@@ -3906,7 +3911,28 @@ var currentUser = null; // {id, name, role:'admin'|'staff'}
 function hashPass(p){ var h=0; for(var i=0;i<p.length;i++){h=Math.imul(31,h)+p.charCodeAt(i)|0;} return h.toString(36); }
 
 function getPasses(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'{}'); }catch(e){return{};} }
-function savePasses(obj){ localStorage.setItem(AUTH_KEY,JSON.stringify(obj)); }
+
+function savePasses(obj){
+  localStorage.setItem(AUTH_KEY, JSON.stringify(obj));
+  // Sync to Supabase so all devices share the same passwords
+  sbUpsert('nk_settings', 'auth_passes', obj).catch(function(e){
+    console.warn('Password sync failed:', e);
+  });
+}
+
+async function loadPassesFromCloud(){
+  try {
+    var row = await sbGet('nk_settings', 'auth_passes');
+    if(row && row.data){
+      // Merge cloud into local (cloud wins)
+      var local = getPasses();
+      var merged = Object.assign({}, local, row.data);
+      localStorage.setItem(AUTH_KEY, JSON.stringify(merged));
+    }
+  } catch(e){
+    console.warn('Could not load passwords from cloud, using local:', e);
+  }
+}
 
 function buildLoginSelects(){
   var opts = '<option value="">— Select —</option><option value="__admin__">Admin (Aryan)</option>';
@@ -4013,13 +4039,16 @@ function initAuth(){
       return;
     }
   }catch(e){}
-  // Check if admin pass is set; if not, go straight to set-password
-  var passes = getPasses();
-  if(!passes['__admin__']){
-    showSetPassword();
-  } else {
-    showLogin();
-  }
+  // Pull latest passwords from Supabase first (so all devices are in sync),
+  // then decide which screen to show
+  loadPassesFromCloud().finally(function(){
+    var passes = getPasses();
+    if(!passes['__admin__']){
+      showSetPassword();
+    } else {
+      showLogin();
+    }
+  });
 }
 
 // (staffMarkDone, adminApprove, switchTab defined above with full implementations)
@@ -4035,8 +4064,22 @@ var CHK_KEY = 'nk_checklist_v1';
 var chkItems = [];
 var chkFilter = 'all';
 
-function chkLoad(){ try{ chkItems=JSON.parse(localStorage.getItem(CHK_KEY)||'[]')||[]; }catch(e){ chkItems=[]; } }
-function chkSave(){ localStorage.setItem(CHK_KEY, JSON.stringify(chkItems)); }
+function chkLoad(){
+  try{ chkItems=JSON.parse(localStorage.getItem(CHK_KEY)||'[]')||[]; }catch(e){ chkItems=[]; }
+}
+
+function chkSave(){
+  localStorage.setItem(CHK_KEY, JSON.stringify(chkItems));
+  // Sync entire checklist as one blob (same pattern as settings)
+  chkItems.forEach(function(item){ sbUpsert('nk_parties',item.id,item).catch(function(){}); });
+}
+
+async function loadChkFromCloud(){
+  try{
+    const rows = await sbGetAll('nk_parties');
+    if(rows && rows.length){ chkItems = rows.map(function(r){return r.data;}).filter(Boolean); localStorage.setItem(CHK_KEY, JSON.stringify(chkItems)); }
+  }catch(e){ console.warn('chk cloud load failed',e); }
+}
 
 function chkBuildAssignee(){
   var el=document.getElementById('chkAssignee');
@@ -4091,6 +4134,7 @@ function chkDelete(id){
   if(item&&!ownsRecord(item)){ toast('You can delete only your own reminder'); return; }
   chkItems=chkItems.filter(function(x){return x.id!==id;});
   chkSave();
+  sbDelete('nk_parties',id).catch(function(){});
   chkRender();
 }
 
@@ -4107,10 +4151,22 @@ let payEditId  = null;
 function payLoad(){
   try{ payEntries = JSON.parse(localStorage.getItem(PAY_KEY)||'[]')||[]; }catch(e){ payEntries=[]; }
 }
+
+async function loadPayFromCloud(){
+  try{
+    const rows = await sbGetAll('nk_settings');
+    if(!rows) return;
+    const pays = rows.filter(r=>r.id && r.id.startsWith('pay_')).map(r=>r.data).filter(Boolean);
+    if(pays.length){
+      payEntries = pays;
+      localStorage.setItem(PAY_KEY, JSON.stringify(payEntries));
+    }
+  }catch(e){ console.warn('pay cloud load failed',e); }
+}
 function paySave(){
   localStorage.setItem(PAY_KEY, JSON.stringify(payEntries));
   // Sync each entry to Supabase (fire-and-forget)
-  payEntries.forEach(e=>sbUpsert('nk_settings','pay_'+e.id,e).catch(()=>{}));
+  payEntries.forEach(e=>sbUpsert('nk_payments',e.id,e).catch(()=>{}));
 }
 
 function payUid(){ return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
@@ -4364,7 +4420,7 @@ function payDelete(id){
   if(!e) return;
   customConfirm(`Delete payment entry for <strong>${esc(e.firm)}</strong>?`, ()=>{
     payEntries = payEntries.filter(x=>x.id!==id);
-    sbDelete('nk_settings','pay_'+id).catch(()=>{});
+    sbDelete('nk_payments',id).catch(()=>{});
     paySave();
     payRender();
     toast('Entry deleted');
