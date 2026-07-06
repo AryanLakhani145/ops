@@ -103,38 +103,58 @@ function syncStatus(state){ // 'syncing'|'ok'|'err'
   --c-orange:#7A3010; --bg-orange:#FBF2EC; --bd-orange:#D4956A;
   --c-rose:#7A1A3A;   --bg-rose:#FBEEf3;   --bd-rose:#DD90AA;
   --c-slate:#2A3A4A;  --bg-slate:#EEF2F6;  --bd-slate:#90AACC;
-  --r:12px; --rsm:8px; --rlg:16px;
+  --brand-red:#8B1A1A;
+  --brand-red-lt:#FBF0F0;
+  --brand-red-bd:#D4A0A0;
+  --r:12px; --r2:16px; --rsm:8px; --rlg:16px;
   --sh:0 1px 4px rgba(0,0,0,0.07),0 2px 10px rgba(0,0,0,0.05);
   --sh2:0 4px 20px rgba(0,0,0,0.10),0 2px 6px rgba(0,0,0,0.06);
 }
 
-/* ── DARK MODE VARIABLES — warm charcoal palette ── */
+/* ── DARK MODE — Nakshatra Brand: deep charcoal · warm cream · royal red · subtle gold ── */
 [data-theme="dark"]{
-  --cream:   #14110C;
-  --cream2:  #1C1812;
-  --cream3:  #26201A;
-  --white:   #201B14;
-  --ink:     #F3EDE1;
-  --ink2:    #D8CFC0;
-  --ink3:    #A79C8B;
-  --ink4:    #79705F;
-  --rule:    #2E2820;
-  --rule2:   #41392E;
-  --gold:    #ECC25C;
-  --gold2:   #DDA53E;
-  --gold-lt: #2A2210;
-  --gold-bd: #9E7A2C;
-  --c-red:#F08080;    --bg-red:#1E0E0E;    --bd-red:#6A2C2C;
-  --c-amber:#E0B84A;  --bg-amber:#1E1608;  --bd-amber:#6A5010;
-  --c-green:#6ED48A;  --bg-green:#0C1E12;  --bd-green:#226030;
-  --c-blue:#78B8F0;   --bg-blue:#0C1422;   --bd-blue:#1E3E70;
-  --c-purple:#BC8AE8; --bg-purple:#160C24; --bd-purple:#421E78;
-  --c-teal:#56CEC0;   --bg-teal:#081816;   --bd-teal:#0C4C44;
-  --c-orange:#E0A478; --bg-orange:#1C100A; --bd-orange:#60341A;
-  --c-rose:#F08AB8;   --bg-rose:#1C0C14;   --bd-rose:#6E1E3A;
-  --c-slate:#9ABCE0;  --bg-slate:#0C1018;  --bd-slate:#22345A;
-  --sh:0 1px 4px rgba(0,0,0,0.32),0 2px 10px rgba(0,0,0,0.26);
-  --sh2:0 8px 28px rgba(0,0,0,0.42),0 2px 8px rgba(0,0,0,0.28);
+  /* Surfaces — rich warm charcoal, never cold grey */
+  --cream:   #0E0C09;
+  --cream2:  #181410;
+  --cream3:  #221E18;
+  --white:   #1C1814;
+
+  /* Typography — warm, not harsh white */
+  --ink:     #EDE5D8;
+  --ink2:    #C8BFAE;
+  --ink3:    #7A7060;
+  --ink4:    #4E4840;
+
+  /* Rules */
+  --rule:    #2C2620;
+  --rule2:   #3A3228;
+
+  /* Gold — warm, not jhatak */
+  --gold:    #C8A444;
+  --gold2:   #A8841C;
+  --gold-lt: #1E1808;
+  --gold-bd: #6A500E;
+
+  /* Status colours — visible but restrained */
+  --c-red:#D07070;    --bg-red:#1A0A0A;    --bd-red:#5C2020;
+  --c-amber:#C89830;  --bg-amber:#1A1408;  --bd-amber:#5A3C0C;
+  --c-green:#5CAE78;  --bg-green:#0A180C;  --bd-green:#1A4C26;
+  --c-blue:#5890C8;   --bg-blue:#0A1220;   --bd-blue:#163060;
+  --c-purple:#9068C8; --bg-purple:#140C20; --bd-purple:#341868;
+  --c-teal:#3CA898;   --bg-teal:#081410;   --bd-teal:#0A3834;
+  --c-orange:#C08460; --bg-orange:#180E08; --bd-orange:#4C2810;
+  --c-rose:#C06890;   --bg-rose:#180A10;   --bd-rose:#4C1828;
+  --c-slate:#6890A8;  --bg-slate:#0C1018;  --bd-slate:#1C2C40;
+
+  --sh:0 1px 3px rgba(0,0,0,0.40),0 2px 10px rgba(0,0,0,0.32);
+  --sh2:0 6px 28px rgba(0,0,0,0.56),0 2px 8px rgba(0,0,0,0.36);
+}
+
+/* Toast — fixed dark color so it never inverts in dark mode */
+.toast{
+  background:#1A160E !important;
+  color:#E8E0D0 !important;
+  border:1px solid #3A3228;
 }
 
 /* Smooth theme transition on key surfaces */
@@ -143,7 +163,7 @@ body,
 .set-sel,.ep-input,.ep-select,.edit-panel,
 .note-card,.notes-capture-card,.notes-topbar,
 .stats-bar,.qchip,.fchip,.sbox,
-.bot,.confirm-overlay .confirm-box,.toast{
+.bot,.confirm-overlay .confirm-box{
   transition:background-color .25s ease, border-color .25s ease, color .2s ease, box-shadow .25s ease;
 }
 
@@ -156,138 +176,216 @@ body,
 }
 .dm-toggle:hover{background:var(--cream2);border-color:var(--rule);}
 
-/* ── DARK MODE SPECIFIC FIXES ── */
-/* Inputs & selects */
+/* ══════════════════════════════════════════════════════
+   DARK MODE OVERRIDES — complete, systematic
+   Brand: charcoal · warm cream · deep red · subtle gold
+══════════════════════════════════════════════════════ */
+
+/* Base surfaces */
+[data-theme="dark"] body{background:var(--cream);color:var(--ink);}
+[data-theme="dark"] .hdr,
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .nav-drawer{background:var(--white);border-color:var(--rule);}
+
+/* All inputs, textareas, selects — cream bg, readable text */
 [data-theme="dark"] input,
 [data-theme="dark"] textarea,
 [data-theme="dark"] select{color:var(--ink);background:transparent;}
-[data-theme="dark"] select option{background:#211F19;color:var(--ink);}
-[data-theme="dark"] .ep-input,
-[data-theme="dark"] .ep-select,
-[data-theme="dark"] .set-sel,
-[data-theme="dark"] .note-cat-edit,
-[data-theme="dark"] .tc-edit-panel .tep-i,
-[data-theme="dark"] .tc-edit-panel .tep-s{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] select option{background:#1C1814;color:var(--ink);}
+[data-theme="dark"] .ep-input,[data-theme="dark"] .ep-select,
+[data-theme="dark"] .set-sel,[data-theme="dark"] .note-cat-edit,
+[data-theme="dark"] .tc-edit-panel .tep-i,[data-theme="dark"] .tc-edit-panel .tep-s,
+[data-theme="dark"] .tep-input,[data-theme="dark"] .tep-select,
+[data-theme="dark"] .crm-modal-input,[data-theme="dark"] .crm-modal-select,[data-theme="dark"] .crm-modal-ta,
+[data-theme="dark"] .login-input,[data-theme="dark"] .login-select,
+[data-theme="dark"] .pcql-sel,[data-theme="dark"] .pcql-inp,[data-theme="dark"] .pcql-date{
+  background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
 [data-theme="dark"] .note-text-edit{background:var(--cream2);color:var(--ink);border-color:var(--gold-bd);}
-[data-theme="dark"] .notes-capture-meta{background:var(--cream2);}
-[data-theme="dark"] .notes-search-wrap{background:var(--cream2);}
+[data-theme="dark"] .notes-capture-meta{background:var(--cream3);}
+[data-theme="dark"] .notes-search-wrap,[data-theme="dark"] .pay-search-wrap,[data-theme="dark"] .crm-search-wrap{background:var(--cream2);}
 
-/* ── ACTION BUTTONS — fixed colors so they never go white-on-white ── */
-/* Primary dark buttons (carry forward, add, save, etc.) */
+/* ── CHIPS & FILTER PILLS ─────────────────────────────
+   The root problem: in dark mode chips had background:var(--white)
+   which maps to #1C1814 — near-invisible on dark backgrounds.
+   Fix: give all inactive chips a visible cream2 surface.
+   Active state: bold gold, never var(--ink) which is cream-coloured.
+── */
+[data-theme="dark"] .ncat-chip,
+[data-theme="dark"] .fchip,
+[data-theme="dark"] .qchip,
+[data-theme="dark"] .chk-fc,
+[data-theme="dark"] .pay-chip,
+[data-theme="dark"] .st,
+[data-theme="dark"] .st-all{
+  background:var(--cream2);
+  color:var(--ink2);
+  border-color:var(--rule2);
+}
+[data-theme="dark"] .ncat-chip:hover,
+[data-theme="dark"] .fchip:hover,
+[data-theme="dark"] .qchip:hover,
+[data-theme="dark"] .chk-fc:hover,
+[data-theme="dark"] .pay-chip:hover{
+  background:var(--cream3);color:var(--ink);border-color:var(--rule);
+}
+/* ACTIVE state — gold, clear, unmistakable */
+[data-theme="dark"] .ncat-chip.ncat-active,
+[data-theme="dark"] .fchip.fa,
+[data-theme="dark"] .chk-fc.on,
+[data-theme="dark"] .pay-ca{
+  background:var(--gold-lt) !important;
+  color:var(--gold) !important;
+  border-color:var(--gold-bd) !important;
+}
+/* Stats bar pills */
+[data-theme="dark"] .st-done{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
+[data-theme="dark"] .st-pend{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);}
+[data-theme="dark"] .st-urg{background:var(--bg-red);color:var(--c-red);border-color:var(--bd-red);}
+
+/* ── TASK CARDS ── */
+[data-theme="dark"] .tc{background:var(--white);border-color:var(--rule);}
+[data-theme="dark"] .tc-note{background:var(--cream2);border-left-color:var(--rule2);}
+[data-theme="dark"] .tag-asgn{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
+[data-theme="dark"] .abtn{border-color:var(--rule2);color:var(--ink4);}
+[data-theme="dark"] .abtn.edit:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
+/* tag-due dark: handled in main DM block */
+
+/* ── SIDEBAR BUTTONS ── */
+[data-theme="dark"] .sb-btn{color:var(--ink2);border-color:transparent;}
+[data-theme="dark"] .sb-btn:hover{background:var(--cream2);border-color:var(--rule2);}
+[data-theme="dark"] .sb-btn.sa{background:var(--gold-lt);color:var(--gold);border-color:var(--gold-bd);}
+
+/* ── CHECKLIST ADD CARD ── */
+[data-theme="dark"] .chk-add-card,[data-theme="dark"] .chk-item{
+  background:var(--white);border-color:var(--rule);}
+[data-theme="dark"] .chk-add-meta,[data-theme="dark"] .chk-add-top{border-color:var(--rule2);}
+[data-theme="dark"] .chk-mf{border-color:var(--rule2);}
+[data-theme="dark"] .chk-mf select,[data-theme="dark"] .chk-mf input{color:var(--ink);}
+[data-theme="dark"] .chk-add-btn{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
+
+/* ── PRIMARY ACTION BUTTONS (save, add, carry-forward) ── */
 [data-theme="dark"] .add-btn,
 [data-theme="dark"] .notes-capture-btn,
 [data-theme="dark"] .ep-save,
 [data-theme="dark"] .note-save-btn,
 [data-theme="dark"] .ss-add,
-[data-theme="dark"] .confirm-yes{
-  background:var(--gold-lt);
-  color:var(--gold);
-  border:1.5px solid var(--gold-bd);
+[data-theme="dark"] .pay-add-btn,
+[data-theme="dark"] .pcql-save,
+[data-theme="dark"] .crm-modal-save,
+[data-theme="dark"] .crm-add-btn,
+[data-theme="dark"] .chl-save-btn,
+[data-theme="dark"] .crm-save-remarks,
+[data-theme="dark"] .login-btn,
+[data-theme="dark"] .tep-save{
+  background:var(--gold-lt) !important;
+  color:var(--gold) !important;
+  border:1.5px solid var(--gold-bd) !important;
 }
-[data-theme="dark"] .add-btn:hover,
-[data-theme="dark"] .notes-capture-btn:hover,
-[data-theme="dark"] .ep-save:hover,
-[data-theme="dark"] .note-save-btn:hover,
-[data-theme="dark"] .ss-add:hover{background:#352808;border-color:#A07820;}
+[data-theme="dark"] .add-btn:hover,[data-theme="dark"] .notes-capture-btn:hover,
+[data-theme="dark"] .ep-save:hover,[data-theme="dark"] .note-save-btn:hover,
+[data-theme="dark"] .ss-add:hover,[data-theme="dark"] .pay-add-btn:hover,
+[data-theme="dark"] .pcql-save:hover,[data-theme="dark"] .crm-modal-save:hover,
+[data-theme="dark"] .crm-add-btn:hover,[data-theme="dark"] .chl-save-btn:hover,
+[data-theme="dark"] .crm-save-remarks:hover,[data-theme="dark"] .login-btn:hover,
+[data-theme="dark"] .tep-save:hover{background:#2C2008 !important;border-color:#8A6A10 !important;}
 
-/* Carry forward — gold accent in dark */
-[data-theme="dark"] .bb-carry{
-  background:var(--gold-lt);
-  color:var(--gold);
-  border-color:var(--gold-bd);
-}
-[data-theme="dark"] .bb-carry:hover{background:#2A2008;border-color:#9A7010;}
+/* Carry forward */
+[data-theme="dark"] .bb-carry{background:var(--gold-lt);color:var(--gold);border-color:var(--gold-bd);}
+[data-theme="dark"] .bb-carry:hover{background:#2C2008;border-color:#8A6A10;}
 
-/* Active sidebar buttons */
-[data-theme="dark"] .sb-btn.sa{
-  background:var(--gold-lt);color:var(--gold);border-color:var(--gold-bd);
-}
+/* ── CANCEL / SECONDARY BUTTONS ── */
+[data-theme="dark"] .ep-cancel,[data-theme="dark"] .note-cancel-btn,
+[data-theme="dark"] .tep-cancel,[data-theme="dark"] .crm-modal-cancel,
+[data-theme="dark"] .nd-foot-btn{
+  background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
+[data-theme="dark"] .ep-cancel:hover,[data-theme="dark"] .note-cancel-btn:hover,
+[data-theme="dark"] .tep-cancel:hover,[data-theme="dark"] .crm-modal-cancel:hover,
+[data-theme="dark"] .nd-foot-btn:hover{background:var(--cream3);}
 
-/* Chip active state */
-[data-theme="dark"] .ncat-chip.ncat-active,
-[data-theme="dark"] .fchip.fa{
-  background:var(--gold-lt);color:var(--gold);border-color:var(--gold-bd);
-}
-
-/* Confirm box */
-[data-theme="dark"] .confirm-box{background:var(--white);}
-[data-theme="dark"] .confirm-yes{background:#5A1818;color:#F0D0D0;border-color:#7A2020;}
-[data-theme="dark"] .confirm-yes:hover{background:#6A1E1E;}
-[data-theme="dark"] .confirm-no{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
-
-/* Note category tags — keep readable on dark */
-[data-theme="dark"] .nct-idea{background:#221808;color:#D4A832;border-color:#5A4010;}
-
-/* Pinned note highlight */
-[data-theme="dark"] .note-card.pinned-card{border-color:var(--gold-bd);background:var(--gold-lt);}
-
-/* Progress bar track */
-[data-theme="dark"] .prog-track{background:var(--cream3);}
-
-/* Stats pills */
-[data-theme="dark"] .st-all{background:var(--cream2);color:var(--ink2);border-color:var(--rule2);}
-
-/* tep (task edit panel) */
-[data-theme="dark"] .tep{background:var(--cream2);}
-[data-theme="dark"] .tep-save{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
-[data-theme="dark"] .tep-save:hover{background:#352808;}
-
-/* Bottom bar */
-[data-theme="dark"] .bot{background:rgba(18,16,12,0.96);}
-
-/* Bottom clear button */
-[data-theme="dark"] .bb-clear{background:transparent;color:var(--ink2);border-color:var(--rule2);}
-[data-theme="dark"] .bb-clear:hover{color:var(--c-red);border-color:var(--bd-red);background:var(--bg-red);}
-
-/* Cancel buttons */
-[data-theme="dark"] .ep-cancel,
-[data-theme="dark"] .note-cancel-btn,
-[data-theme="dark"] .tep-cancel{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
-[data-theme="dark"] .ep-cancel:hover,
-[data-theme="dark"] .note-cancel-btn:hover,
-[data-theme="dark"] .tep-cancel:hover{background:var(--cream3);}
-
-/* Task delete button in edit panel */
-[data-theme="dark"] .tep-del{background:transparent;color:var(--c-red);border-color:var(--bd-red);}
-[data-theme="dark"] .tep-del:hover{background:var(--bg-red);}
-
-/* People cards */
-[data-theme="dark"] .pcard.pa{border-color:var(--gold-bd);background:var(--gold-lt);}
-
-/* Quick chips hover */
-[data-theme="dark"] .qchip:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
-
-/* Set edit/del buttons */
+/* ── SETTINGS BUTTONS ── */
 [data-theme="dark"] .set-edit-btn{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
 [data-theme="dark"] .set-edit-btn:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
 [data-theme="dark"] .set-del-btn{background:var(--cream2);color:var(--ink4);border-color:var(--rule2);}
 [data-theme="dark"] .set-del-btn:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
-
-/* Add new buttons (dashed) */
 [data-theme="dark"] .add-new-btn{border-color:var(--rule2);color:var(--ink3);}
 [data-theme="dark"] .add-new-btn:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
+[data-theme="dark"] .tpl-use{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
+[data-theme="dark"] .tpl-use:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
 
-/* Note action buttons */
+/* ── PAYMENT CARD BUTTONS ── */
+[data-theme="dark"] .pc-btn{background:var(--cream2);border-color:var(--rule2);color:var(--ink3);}
+[data-theme="dark"] .pc-btn:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
+[data-theme="dark"] .pc-btn.pb-call:hover{border-color:var(--bd-green);color:var(--c-green);background:var(--bg-green);}
+[data-theme="dark"] .pc-btn.pb-visit:hover{border-color:var(--bd-blue);color:var(--c-blue);background:var(--bg-blue);}
+[data-theme="dark"] .pc-btn.pb-recv:hover{border-color:var(--bd-green);color:var(--c-green);background:var(--bg-green);}
+[data-theme="dark"] .pc-btn.pb-del:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
+[data-theme="dark"] .pc-btn.btn-active{background:var(--bg-green);border-color:var(--bd-green);color:var(--c-green);}
+[data-theme="dark"] .pc-btn.btn-active-blue{background:var(--bg-blue);border-color:var(--bd-blue);color:var(--c-blue);}
+[data-theme="dark"] .pc,[data-theme="dark"] .pay-topbar,[data-theme="dark"] .pay-stat{
+  background:var(--white);border-color:var(--rule);}
+[data-theme="dark"] .pc-quick-log,[data-theme="dark"] .pli{background:var(--cream3);border-color:var(--rule2);}
+
+/* ── CONFIRM BOX ── */
+[data-theme="dark"] .confirm-box{background:var(--white);}
+[data-theme="dark"] .confirm-yes{background:#5A1414;color:#F0C8C8;border:none;}
+[data-theme="dark"] .confirm-yes:hover{background:#701A1A;}
+[data-theme="dark"] .confirm-no{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+
+/* ── CRM ── */
+[data-theme="dark"] .crm-modal{background:var(--white);}
+[data-theme="dark"] .crm-modal-close{background:var(--cream3);color:var(--ink3);}
+[data-theme="dark"] .crm-modal-input:focus,[data-theme="dark"] .crm-modal-select:focus,
+[data-theme="dark"] .crm-modal-ta:focus{background:var(--cream3);border-color:var(--gold-bd);}
+[data-theme="dark"] .chl-add-form{background:var(--cream3);}
+[data-theme="dark"] .chl-type-sel,[data-theme="dark"] .chl-sal-sel,
+[data-theme="dark"] .chl-note-inp,[data-theme="dark"] .chl-date-inp{
+  background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] .chl-note-inp:focus,[data-theme="dark"] .chl-type-sel:focus,
+[data-theme="dark"] .chl-sal-sel:focus,[data-theme="dark"] .chl-date-inp:focus{border-color:var(--gold-bd);}
+[data-theme="dark"] .crm-remarks-ta{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] .chl-item{background:var(--cream3);border-color:var(--rule2);}
+[data-theme="dark"] .crm-stat{background:var(--white);border-color:var(--rule2);}
+/* Samples dark: handled in main DM block */
+
+/* ── NOTES ── */
+[data-theme="dark"] .note-card{background:var(--white);border-color:var(--rule);}
+[data-theme="dark"] .note-card.pinned-card{border-color:var(--gold-bd);background:var(--gold-lt);}
+[data-theme="dark"] .nct-idea{background:#221808;color:#C8A444;border-color:#5A4010;}
 [data-theme="dark"] .nab{border-color:var(--rule2);color:var(--ink4);}
 [data-theme="dark"] .nab.pin-btn.pinned{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
 
-/* Danger zone */
+/* ── BOTTOM BAR ── */
+[data-theme="dark"] .bot{background:rgba(14,12,9,0.97);}
+[data-theme="dark"] .bb-clear{background:transparent;color:var(--ink2);border-color:var(--rule2);}
+[data-theme="dark"] .bb-clear:hover{color:var(--c-red);border-color:var(--bd-red);background:var(--bg-red);}
+
+/* ── MISC ── */
+[data-theme="dark"] .prog-track{background:var(--cream3);}
+[data-theme="dark"] .tep,[data-theme="dark"] .tc-edit-panel{background:var(--cream2);}
+[data-theme="dark"] .info-card{background:var(--gold-lt);border-color:var(--gold-bd);}
+[data-theme="dark"] .info-text{color:var(--ink2);}
 [data-theme="dark"] .danger-zone{border-color:var(--bd-red)!important;}
 [data-theme="dark"] .danger-zone .ss-head{background:var(--bg-red);border-bottom-color:var(--bd-red);}
 [data-theme="dark"] .danger-zone .ss-title{color:var(--c-red);}
 [data-theme="dark"] .danger-btn{border-color:var(--bd-red);color:var(--c-red);}
 [data-theme="dark"] .danger-btn:hover{background:var(--bg-red);}
+[data-theme="dark"] .staff-banner{background:var(--gold-lt);border-color:var(--gold-bd);}
+[data-theme="dark"] .pcard.pa{border-color:var(--gold-bd);background:var(--gold-lt);}
+[data-theme="dark"] .pass-reset-btn{background:var(--cream2);border-color:var(--rule2);color:var(--ink3);}
+[data-theme="dark"] .login-box{background:var(--white);border-color:var(--rule2);}
+[data-theme="dark"] .login-select option{background:#1C1814;}
 
-/* Tpl use button */
-[data-theme="dark"] .tpl-use{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
-[data-theme="dark"] .tpl-use:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
-
-/* Info card */
-[data-theme="dark"] .info-card{background:var(--gold-lt);border-color:var(--gold-bd);}
-[data-theme="dark"] .info-text{color:var(--ink2);}
-
-/* hdr-right non-today tabs */
 [data-theme="dark"] .hdr-right{color:var(--ink);}
+[data-theme="dark"] .prog-fill{background:linear-gradient(90deg,#8B1A1A,var(--gold));}
+[data-theme="dark"] .nd-item{color:var(--ink3);}
+[data-theme="dark"] .nd-item:hover{background:var(--cream2);color:var(--ink);}
+[data-theme="dark"] .nd-item.nd-active{background:var(--gold-lt);color:var(--gold);border-color:var(--gold-bd);}
+[data-theme="dark"] .hamburger{background:var(--white);border-color:var(--rule2);}
+[data-theme="dark"] .hamburger span{background:var(--ink2);}
+[data-theme="dark"] .hamburger:hover{border-color:var(--gold-bd);background:var(--gold-lt);}
+[data-theme="dark"] .tab-btn{color:var(--ink4);}
+[data-theme="dark"] .tab-btn.active{color:var(--ink);border-bottom-color:var(--gold);}
+[data-theme="dark"] .tab-btn:hover:not(.active){color:var(--ink2);}
 html,body{min-height:100%;min-height:-webkit-fill-available;}
 body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 
@@ -401,7 +499,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 /* Quick chips */
 .qrow{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:2px 0;}
 .qrow::-webkit-scrollbar{display:none;}
-.qchip{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:7px 13px;background:var(--white);border:1.5px solid var(--rule2);border-radius:20px;font-size:0.72rem;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap;box-shadow:var(--sh);}
+.qchip{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:7px 13px;background:var(--cream2);border:1.5px solid var(--rule2);border-radius:20px;font-size:0.72rem;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap;box-shadow:var(--sh);}
 .qchip:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
 .qchip:active{transform:scale(.97);}
 .qdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
@@ -409,9 +507,12 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 /* Filter chips - mobile */
 .frow{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding:2px 0;}
 .frow::-webkit-scrollbar{display:none;}
-.fc{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:7px 13px;background:var(--white);border:1.5px solid var(--rule2);border-radius:20px;font-size:0.72rem;font-weight:500;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap;box-shadow:var(--sh);}
+.fc{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:7px 13px;background:var(--cream2);border:1.5px solid var(--rule2);border-radius:20px;font-size:0.72rem;font-weight:500;color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap;box-shadow:var(--sh);}
 .fc:hover{color:var(--ink);}
 .fc.fa{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:none;}
+[data-theme="dark"] .fc{background:var(--cream2);color:var(--ink2);border-color:var(--rule2);box-shadow:none;}
+[data-theme="dark"] .fc:hover{background:var(--cream3);color:var(--ink);border-color:var(--rule);}
+[data-theme="dark"] .fc.fa{background:var(--gold-lt) !important;color:var(--gold) !important;border-color:var(--gold-bd) !important;}
 .fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 
 /* Search */
@@ -467,8 +568,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .tag-due-today{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);font-weight:700;}
 .tag-due-overdue{background:var(--bg-red);color:var(--c-red);border-color:var(--bd-red);font-weight:700;}
 .tag-due-done{background:var(--cream2);color:var(--ink4);border-color:var(--rule);text-decoration:line-through;opacity:.6;}
-[data-theme="dark"] .tag-due{background:var(--cream3);color:var(--ink3);border-color:var(--rule2);}
-[data-theme="dark"] .tag-due-done{background:var(--cream3);}
+/* tag-due dark: handled in main DM block */
 .tag-high{background:var(--bg-red);color:var(--c-red);border-color:var(--bd-red);}
 .tag-medium{background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);}
 .tag-low{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
@@ -615,7 +715,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 #notesSearch::placeholder{color:var(--ink4);}
 .notes-cat-filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:1px 0;}
 .notes-cat-filters::-webkit-scrollbar{display:none;}
-.ncat-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--rule2);background:var(--white);color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ncat-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--rule2);background:var(--cream2);color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .ncat-chip:hover{border-color:var(--rule);color:var(--ink);}
 .ncat-chip.ncat-active{background:var(--ink);border-color:var(--ink);color:#fff;}
 
@@ -697,9 +797,12 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .crm-add-btn:hover{background:var(--ink2);}
 .crm-filter-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:1px 0;}
 .crm-filter-chips::-webkit-scrollbar{display:none;}
-.crm-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--rule2);background:var(--white);color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.crm-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--rule2);background:var(--cream2);color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .crm-chip:hover{border-color:var(--rule);color:var(--ink);}
 .crm-chip.ca{background:var(--ink);border-color:var(--ink);color:#fff;}
+[data-theme="dark"] .crm-chip{background:var(--cream2);color:var(--ink2);border-color:var(--rule2);}
+[data-theme="dark"] .crm-chip:hover{background:var(--cream3);color:var(--ink);border-color:var(--rule);}
+[data-theme="dark"] .crm-chip.ca{background:var(--gold-lt) !important;color:var(--gold) !important;border-color:var(--gold-bd) !important;}
 .crm-chip.ca-green{background:var(--bg-green);border-color:var(--bd-green);color:var(--c-green);}
 .crm-chip.ca-amber{background:var(--bg-amber);border-color:var(--bd-amber);color:var(--c-amber);}
 .crm-chip.ca-red{background:var(--bg-red);border-color:var(--bd-red);color:var(--c-red);}
@@ -823,23 +926,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .crm-empty-icon{font-family:'Lora',serif;font-style:italic;font-size:2rem;color:var(--rule2);margin-bottom:10px;}
 .crm-empty p{font-size:0.84rem;color:var(--ink4);}
 
-/* Dark mode CRM adjustments */
-[data-theme="dark"] .crm-modal{background:var(--white);}
-[data-theme="dark"] .crm-modal-input,[data-theme="dark"] .crm-modal-select,[data-theme="dark"] .crm-modal-ta{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
-[data-theme="dark"] .crm-modal-input:focus,[data-theme="dark"] .crm-modal-select:focus,[data-theme="dark"] .crm-modal-ta:focus{background:var(--cream3);border-color:var(--gold-bd);}
-[data-theme="dark"] .crm-modal-save{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
-[data-theme="dark"] .crm-modal-save:hover{background:#352808;}
-[data-theme="dark"] .crm-modal-cancel{background:var(--cream2);color:var(--ink3);border-color:var(--rule2);}
-[data-theme="dark"] .chl-add-form{background:var(--cream3);}
-[data-theme="dark"] .chl-type-sel,[data-theme="dark"] .chl-sal-sel,[data-theme="dark"] .chl-note-inp,[data-theme="dark"] .chl-date-inp{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
-[data-theme="dark"] .chl-note-inp:focus,[data-theme="dark"] .chl-type-sel:focus,[data-theme="dark"] .chl-sal-sel:focus,[data-theme="dark"] .chl-date-inp:focus{border-color:var(--gold-bd);}
-[data-theme="dark"] .crm-remarks-ta{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
-[data-theme="dark"] .chl-item{background:var(--cream3);border-color:var(--rule2);}
-[data-theme="dark"] .crm-add-btn,[data-theme="dark"] .chl-save-btn,[data-theme="dark"] .crm-save-remarks{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
-[data-theme="dark"] .crm-add-btn:hover,[data-theme="dark"] .chl-save-btn:hover,[data-theme="dark"] .crm-save-remarks:hover{background:#352808;}
-[data-theme="dark"] .crm-stat{background:var(--white);border-color:var(--rule2);}
-[data-theme="dark"] .crm-search-wrap{background:var(--cream2);}
-[data-theme="dark"] .crm-modal-close{background:var(--cream3);color:var(--ink3);}
+/* CRM dark mode: handled in main DM block */
 
 @media(min-width:900px){
   .crm-topbar{padding:14px 28px 12px;}
@@ -890,8 +977,7 @@ body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;f
 .css-ra.del-sample:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
 .css-remarks{font-size:0.75rem;color:var(--ink3);margin-top:4px;line-height:1.4;font-style:italic;}
 
-[data-theme="dark"] .crm-samples-section{background:var(--white);border-color:var(--rule2);}
-[data-theme="dark"] .css-count{background:var(--cream3);border-color:var(--rule2);}
+/* Samples dark: handled in main DM block */
 
 @media(min-width:900px){
   .crm-samples-section{margin:0 28px 32px;}
@@ -1081,6 +1167,14 @@ body.drawer-open .hamburger span:nth-child(3){transform:translateY(-6.5px) rotat
   font-size:0.7rem;cursor:pointer;transition:all .15s;
 }
 .pass-reset-btn:hover{border-color:var(--bd-red);color:var(--c-red);background:var(--bg-red);}
+.pm-input-wrap{display:flex;align-items:center;gap:7px;margin-top:7px;}
+.pm-inp{flex:1;padding:7px 11px;border:1.5px solid var(--rule2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.84rem;color:var(--ink);background:var(--cream2);outline:none;transition:border-color .2s;min-width:0;}
+.pm-inp:focus{border-color:var(--gold-bd);}
+.pm-save-btn{padding:7px 14px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s;}
+.pm-save-btn:hover{background:var(--ink2);}
+.pm-pass-hint{font-size:0.68rem;color:var(--ink4);}
+[data-theme="dark"] .pm-inp{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
+[data-theme="dark"] .pm-save-btn{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
 
 .pending-badge{
   display:inline-flex;align-items:center;gap:4px;
@@ -1137,7 +1231,7 @@ body.drawer-open .hamburger span:nth-child(3){transform:translateY(-6.5px) rotat
 .chk-filter-row::-webkit-scrollbar{display:none;}
 .chk-fc{
   flex-shrink:0;padding:6px 13px;border-radius:20px;
-  border:1.5px solid var(--rule2);background:var(--white);
+  border:1.5px solid var(--rule2);background:var(--cream2);
   color:var(--ink3);font-size:0.7rem;font-weight:500;
   cursor:pointer;transition:all .12s;white-space:nowrap;
 }
@@ -1172,14 +1266,7 @@ body.drawer-open .hamburger span:nth-child(3){transform:translateY(-6.5px) rotat
 .chk-sec-line{flex:1;height:1px;background:var(--rule);}
 .chk-sec-lbl{font-size:0.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink4);font-weight:600;}
 
-/* dark mode for new elements */
-[data-theme="dark"] .login-box{background:var(--white);border-color:var(--rule);}
-[data-theme="dark"] .login-input,[data-theme="dark"] .login-select{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
-[data-theme="dark"] .login-select option{background:#1E1C16;}
-[data-theme="dark"] .login-btn{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
-[data-theme="dark"] .staff-banner{background:var(--gold-lt);}
-[data-theme="dark"] .chk-add-card,[data-theme="dark"] .chk-item{background:var(--white);}
-[data-theme="dark"] .chk-mf select,[data-theme="dark"] .chk-mf input{color:var(--ink);}
+/* login/checklist dark: handled in main DM block */
 
 @media(min-width:900px){
   .chk-body{padding:20px 28px 100px;max-width:780px;}
@@ -1199,7 +1286,7 @@ body.drawer-open .hamburger span:nth-child(3){transform:translateY(-6.5px) rotat
 .pay-add-btn:hover{background:var(--ink2);}
 .pay-filter-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:1px 0;}
 .pay-filter-chips::-webkit-scrollbar{display:none;}
-.pay-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--rule2);background:var(--white);color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pay-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--rule2);background:var(--cream2);color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .pay-chip:hover{border-color:var(--rule);color:var(--ink);}
 .pay-ca{background:var(--ink);border-color:var(--ink);color:#fff;}
 .pay-stats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:10px 16px;background:var(--cream2);border-bottom:1.5px solid var(--rule);}
@@ -1239,8 +1326,11 @@ body.drawer-open .hamburger span:nth-child(3){transform:translateY(-6.5px) rotat
 .pnb-ok{background:var(--bg-green);color:var(--c-green);border-color:var(--bd-green);}
 .pnb-none{background:var(--cream2);color:var(--ink4);border-color:var(--rule2);}
 .pc-tags{display:flex;align-items:center;gap:6px;padding:0 14px 10px;flex-wrap:wrap;}
-.pc-actions{display:flex;gap:6px;padding:0 14px 12px;border-top:1px solid var(--rule);padding-top:10px;flex-wrap:wrap;}
-.pc-btn{flex:1;min-width:0;padding:7px 6px;border:1.5px solid var(--rule2);border-radius:7px;background:none;font-family:'DM Sans',sans-serif;font-size:0.67rem;font-weight:500;color:var(--ink3);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;}
+.pc-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px 14px 12px;border-top:1px solid var(--rule);}
+@media(min-width:520px){.pc-actions{grid-template-columns:repeat(6,1fr);}}
+.pc-btn{padding:9px 4px;border:1.5px solid var(--rule2);border-radius:8px;background:var(--cream2);font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;color:var(--ink3);cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;white-space:nowrap;line-height:1.2;}
+.pc-btn .pc-btn-ic{font-size:1rem;line-height:1;}
+.pc-btn .pc-btn-lbl{font-size:0.6rem;letter-spacing:0.03em;}
 .pc-btn:hover{border-color:var(--gold-bd);color:var(--gold);background:var(--gold-lt);}
 .pc-btn.pb-call:hover{border-color:var(--bd-green);color:var(--c-green);background:var(--bg-green);}
 .pc-btn.pb-visit:hover{border-color:var(--bd-blue);color:var(--c-blue);background:var(--bg-blue);}
@@ -1271,13 +1361,7 @@ body.drawer-open .hamburger span:nth-child(3){transform:translateY(-6.5px) rotat
 .pay-empty{text-align:center;padding:60px 20px;}
 .pay-empty-icon{font-family:'Lora',serif;font-style:italic;font-size:2rem;color:var(--rule2);margin-bottom:10px;}
 .pay-empty p{font-size:0.84rem;color:var(--ink4);}
-[data-theme="dark"] .pay-topbar,[data-theme="dark"] .pc{background:var(--white);}
-[data-theme="dark"] .pay-search-wrap{background:var(--cream2);}
-[data-theme="dark"] .pc-quick-log,[data-theme="dark"] .pli{background:var(--cream3);border-color:var(--rule2);}
-[data-theme="dark"] .pcql-sel,[data-theme="dark"] .pcql-inp,[data-theme="dark"] .pcql-date{background:var(--cream2);color:var(--ink);border-color:var(--rule2);}
-[data-theme="dark"] .pay-stat{background:var(--white);border-color:var(--rule2);}
-[data-theme="dark"] .pay-add-btn,[data-theme="dark"] .pcql-save{background:var(--gold-lt);color:var(--gold);border:1.5px solid var(--gold-bd);}
-[data-theme="dark"] .pay-add-btn:hover,[data-theme="dark"] .pcql-save:hover{background:#352808;}
+/* Payments dark: handled in main DM block */
 @media(min-width:900px){
   .pay-topbar{padding:14px 28px 12px;}
   .pay-list{padding:16px 28px 80px;}
@@ -2521,7 +2605,7 @@ function taskHTML(t){
   const noteH=t.note?`<div class="tc-note">${esc(t.note)}</div>`:'';
   const timeTag=t.time?`<span class="tag tag-time">⏱ ${esc(t.time)}</span>`:'';
   const asgnTag=t.assignee?`<span class="tag tag-asgn">${esc(t.assignee)}</span>`:'';
-  const createdTag=isAdmin()&&t.createdBy?`<span class="tag" style="background:var(--bg-slate);color:var(--c-slate);border-color:var(--bd-slate);">Added by ${esc(t.createdBy)}</span>`:'';
+  const createdTag=(!isAdmin()&&t.createdBy&&t.createdBy!==currentUser?.name)?`<span class="tag" style="background:var(--bg-slate);color:var(--c-slate);border-color:var(--bd-slate);">Added by ${esc(t.createdBy)}</span>`:'';
 
   let dueDateTag = '';
   if(t.dueDate && !t.done){
@@ -2547,15 +2631,16 @@ function taskHTML(t){
   let actionBtns = '';
   if(staffMode){
     if(t.pendingApproval){
-      actionBtns = `<button class="mark-done-btn" disabled style="opacity:.5;cursor:default;">⏳ Pending</button>`;
+      // Staff can undo before admin approves
+      actionBtns = `<button class="mark-done-btn" onclick="staffUndoDone('${t.id}')" style="background:var(--bg-amber);color:var(--c-amber);border-color:var(--bd-amber);">↩ Undo</button>`;
     } else if(!t.done){
       actionBtns = `<button class="mark-done-btn" onclick="staffMarkDone('${t.id}')">Mark Done</button>`;
     }
   } else {
-    // Admin sees normal edit/del + approve button if pending
-    const approveBtn = t.pendingApproval
-      ? `<button class="approve-btn" onclick="adminApprove('${t.id}')">✓ Approve</button>` : '';
-    actionBtns = `${approveBtn}<button class="abtn edit" onclick="openTaskEdit('${t.id}')">Edit</button><button class="abtn del" onclick="delTask('${t.id}')">Del</button>`;
+    // Admin: approve + reject if pending, else normal edit/del
+    const approveRejectBtns = t.pendingApproval
+      ? `<button class="approve-btn" onclick="adminApprove('${t.id}')">✓ Approve</button><button class="abtn" onclick="adminReject('${t.id}')" style="border-color:var(--bd-red);color:var(--c-red);margin-top:3px;">✕ Reject</button>` : '';
+    actionBtns = `${approveRejectBtns}<button class="abtn edit" onclick="openTaskEdit('${t.id}')">Edit</button><button class="abtn del" onclick="delTask('${t.id}')">Del</button>`;
   }
 
   return `<div class="tc ${t.done?'dtc':''} ${t.pendingApproval?'pending-tc':''}" id="tc-${t.id}">
@@ -3123,6 +3208,7 @@ function adminRender(){
         </div>
       </div>
       <button class="approve-btn" onclick="adminApprove('${t.id}')">Approve</button>
+      <button class="abtn" onclick="adminReject('${t.id}')" style="border-color:var(--bd-red);color:var(--c-red);font-size:0.65rem;padding:5px 9px;">Reject</button>
     </div>`).join('');
 }
 
@@ -3635,7 +3721,7 @@ function crmCardHTML(c){
           <div class="cc-status-dot ${dotCls}"></div>
           <span style="font-size:0.7rem;color:var(--ink3)">${esc(c.status?.charAt(0).toUpperCase()+c.status?.slice(1)||'')}</span>
           ${c.city?`· <span>${esc(c.city)}</span>`:''}
-          ${c.createdBy?`· <span>Added by ${esc(c.createdBy)}</span>`:''}
+          ${c.createdBy&&!isAdmin()?`· <span>Added by ${esc(c.createdBy)}</span>`:''}
         </div>
       </div>
       <div class="cc-right">
@@ -3965,10 +4051,21 @@ function staffMarkDone(id){
   t.pendingBy=currentUser.name;
   t.pendingAt=Date.now();
   persist();
-  // Sync to Supabase so admin sees it
   if(typeof sbSaveTask==='function') sbSaveTask(t).catch(function(){});
   render();
   toast('Marked done ✓ — waiting for admin approval');
+}
+
+function staffUndoDone(id){
+  var t=tasks.find(function(x){return x.id===id;});
+  if(!t) return;
+  t.pendingApproval=false;
+  t.pendingBy=null;
+  t.pendingAt=null;
+  persist();
+  if(typeof sbSaveTask==='function') sbSaveTask(t).catch(function(){});
+  render();
+  toast('Undone — task is pending again');
 }
 
 function adminApprove(id){
@@ -3985,29 +4082,51 @@ function adminApprove(id){
   toast('Task approved ✓');
 }
 
+function adminReject(id){
+  if(!isAdmin()){ toast('Admin access only'); return; }
+  var t=tasks.find(function(x){return x.id===id;});
+  if(!t) return;
+  t.pendingApproval=false;
+  t.rejectedBy=currentUser.name;
+  t.rejectedAt=Date.now();
+  t.rejectionNote='Admin sent back';
+  persist();
+  if(typeof sbSaveTask==='function') sbSaveTask(t).catch(function(){});
+  render();
+  toast('Task sent back to ' + (t.assignee||'staff'));
+}
+
 // ══════════════════════════════════════
 // PASSWORD MANAGEMENT (admin panel)
 // ══════════════════════════════════════
 function buildPassMgmt(){
-  // Only visible to admin
   var section=document.getElementById('passSection');
   if(!section) return;
   if(!currentUser||currentUser.role!=='admin'){ section.style.display='none'; return; }
   section.style.display='';
-
   var passes=getPasses();
   var members=[{id:'__admin__',name:'Aryan (Admin)'}];
   (people||[]).filter(function(p){return p.status==='active';}).forEach(function(p){
     members.push({id:p.id,name:p.name});
   });
-
   var html=members.map(function(m){
     var hasPass=!!passes[m.id];
-    return '<div class="pass-mgmt-row">'+
-      '<div><div class="pass-mgmt-name">'+m.name+'</div>'+
-      '<div class="pass-mgmt-status">'+(hasPass?'Password set':'No password yet')+'</div></div>'+
-      '<button class="pass-reset-btn" onclick="adminResetPass(\''+m.id+'\',\''+m.name+'\')">Reset</button>'+
-      '</div>';
+    var statusHtml=hasPass
+      ? '<span style="color:var(--c-green);font-size:0.68rem;font-weight:600;">✓ Set</span>'
+      : '<span style="color:var(--c-red);font-size:0.68rem;font-weight:600;">✗ Not set</span>';
+    var showInput = !hasPass;
+    return '<div class="pass-mgmt-row" id="pmrow-'+m.id+'">'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div class="pass-mgmt-name">'+m.name+'</div>'+
+        '<div class="pass-mgmt-status">'+statusHtml+
+          (hasPass ? '&nbsp;&nbsp;<a href="#" style="font-size:0.65rem;color:var(--gold);text-decoration:underline;" onclick="pmToggleInput(\''+m.id+'\');return false;">Change password</a>' : '')+
+        '</div>'+
+        '<div class="pm-input-wrap" id="pminp-'+m.id+'" style="display:'+(showInput?'flex':'none')+';">'+
+          '<input class="pm-inp" type="text" id="pmval-'+m.id+'" placeholder="Type new password (min 4 chars)…" autocomplete="new-password"/>'+
+          '<button class="pm-save-btn" onclick="adminSetPassInline(\''+m.id+'\',\''+m.name+'\')">Save</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
   }).join('');
   var el=document.getElementById('passMgmtList');
   if(el) el.innerHTML=html;
@@ -4023,6 +4142,27 @@ function adminResetPass(id,name){
   toast('Password updated for '+name+' ✓');
   buildPassMgmt();
 }
+function pmToggleInput(id){
+  var wrap=document.getElementById('pminp-'+id);
+  if(!wrap) return;
+  var shown = wrap.style.display!=='none';
+  wrap.style.display = shown ? 'none' : 'flex';
+  if(!shown){ var inp=document.getElementById('pmval-'+id); if(inp) inp.focus(); }
+}
+function adminSetPassInline(id,name){
+  var inp=document.getElementById('pmval-'+id);
+  if(!inp) return;
+  var val=inp.value.trim();
+  if(!val){ toast('Enter a password'); inp.focus(); return; }
+  if(val.length<4){ toast('Min 4 characters'); inp.focus(); return; }
+  var passes=getPasses();
+  passes[id]=hashPass(val);
+  savePasses(passes).then(function(synced){
+    toast('Password set for '+name+(synced?' · synced ☁':' · saved locally')+ ' ✓');
+    buildPassMgmt();
+  });
+}
+
 
 // Hook settings tab to build password section — merged into switchTab below
 
@@ -4059,7 +4199,7 @@ function chkRender(){
   function itemHTML(item){
     var aTag=item.assignee?'<span class="chk-tag" style="background:var(--bg-blue);color:var(--c-blue);border-color:var(--bd-blue);">→ '+item.assignee+'</span>':'';
     var noteTag=item.note?'<span class="chk-tag" style="background:var(--cream2);color:var(--ink3);border-color:var(--rule2);">'+item.note+'</span>':'';
-    var byTag=item.createdBy?'<span class="chk-tag" style="background:var(--bg-slate);color:var(--c-slate);border-color:var(--bd-slate);">Added by '+item.createdBy+'</span>':'';
+    var byTag=(item.createdBy&&!(currentUser&&currentUser.role==='admin'&&item.createdBy===actorName()))?'<span class="chk-tag" style="background:var(--bg-slate);color:var(--c-slate);border-color:var(--bd-slate);">Added by '+item.createdBy+'</span>':'';
     var delBtn=ownsRecord(item)?'<button class="chk-del" onclick="chkDelete(\''+item.id+'\')" title="Remove">×</button>':'';
     return '<div class="chk-item '+(item.done?'chk-done':'')+'">'+
       '<div class="chk-cb '+(item.done?'ck':'')+'" onclick="chkToggle(\''+item.id+'\')"></div>'+
@@ -4504,7 +4644,7 @@ function payCardHTML(e){
           ${e.contact?`<span>👤 ${esc(e.contact)}</span>`:''}
           ${e.assignee?`<span style="background:var(--bg-blue);color:var(--c-blue);border:1px solid var(--bd-blue);border-radius:4px;padding:1px 6px;font-size:0.62rem;font-weight:600;">→ ${esc(e.assignee)}</span>`:''}
           ${e.dueDate?`<span>📅 Due ${fmtDate(e.dueDate)}</span>`:''}
-          ${e.createdBy?`<span>Added by ${esc(e.createdBy)}</span>`:''}
+          ${e.createdBy&&!isAdmin()?`<span>Added by ${esc(e.createdBy)}</span>`:''}
         </div>
       </div>
       <div class="pc-right">
@@ -4514,12 +4654,12 @@ function payCardHTML(e){
       </div>
     </div>
     <div class="pc-actions">
-      <button class="pc-btn pb-call ${isCalled?'btn-active':''}" onclick="payQuickAction('${e.id}','call')" title="Log a call">📞 Called</button>
-      <button class="pc-btn pb-visit ${isVisited?'btn-active-blue':''}" onclick="payQuickAction('${e.id}','visit')" title="Log a visit">🚗 Visited</button>
-      <button class="pc-btn" onclick="payQuickAction('${e.id}','follow_up')" title="Set next follow-up">🔁 Follow-up</button>
-      <button class="pc-btn pb-recv ${isRecv?'btn-active':''}" onclick="payQuickAction('${e.id}','received')" title="Mark payment received">✅ Received</button>
-      <button class="pc-btn pb-edit" onclick="payOpenModal('${e.id}')">✎ Edit</button>
-      <button class="pc-btn pb-del" onclick="payDelete('${e.id}')">✕</button>
+      <button class="pc-btn pb-call ${isCalled?'btn-active':''}" onclick="payQuickAction('${e.id}','call')"><span class="pc-btn-ic">📞</span><span class="pc-btn-lbl">Called</span></button>
+      <button class="pc-btn pb-visit ${isVisited?'btn-active-blue':''}" onclick="payQuickAction('${e.id}','visit')"><span class="pc-btn-ic">🚗</span><span class="pc-btn-lbl">Visited</span></button>
+      <button class="pc-btn" onclick="payQuickAction('${e.id}','follow_up')"><span class="pc-btn-ic">🔁</span><span class="pc-btn-lbl">Follow-up</span></button>
+      <button class="pc-btn pb-recv ${isRecv?'btn-active':''}" onclick="payQuickAction('${e.id}','received')"><span class="pc-btn-ic">✅</span><span class="pc-btn-lbl">Received</span></button>
+      <button class="pc-btn pb-edit" onclick="payOpenModal('${e.id}')"><span class="pc-btn-ic">✏️</span><span class="pc-btn-lbl">Edit</span></button>
+      <button class="pc-btn pb-del" onclick="payDelete('${e.id}')"><span class="pc-btn-ic">🗑</span><span class="pc-btn-lbl">Delete</span></button>
     </div>
     <button class="pc-log-btn" onclick="payToggleLog('${e.id}')">
       <span id="plb-arrow-${e.id}">▸</span> Activity Log (${logs.length})
